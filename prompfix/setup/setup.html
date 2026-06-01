@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prompfix Setup</title>
+  <link rel="stylesheet" href="setup.css" />
+</head>
+<body>
+  <div class="setup-shell">
+    <header>
+      <h1>Prompfix Setup</h1>
+      <p>Get ready to refine prompts faster and keep your settings private.</p>
+    </header>
+
+    <form id="setup-form">
+      <label>
+        First name
+        <input id="first-name" type="text" required placeholder="Jane" />
+      </label>
+
+      <label>
+        Social link <span>(optional)</span>
+        <input id="social-link" type="url" placeholder="https://github.com/jane" />
+      </label>
+
+      <label>
+        Default mode
+        <select id="default-mode">
+          <option value="Basic">Basic</option>
+          <option value="Balanced">Balanced</option>
+          <option value="Advanced">Advanced</option>
+        </select>
+      </label>
+
+      <label>
+        API provider
+        <select id="api-provider">
+          <option value="OpenAI">OpenAI</option>
+          <option value="Gemini">Gemini</option>
+          <option value="Claude">Claude</option>
+          <option value="OpenRouter">OpenRouter</option>
+        </select>
+      </label>
+
+      <label>
+        API key
+        <div class="password-row">
+          <input id="api-key" type="password" required placeholder="sk-..." />
+          <button id="toggle-key" type="button">Show</button>
+        </div>
+      </label>
+
+      <label class="checkbox-label">
+        <input id="save-history" type="checkbox" />
+        Save my prompt history on this device
+      </label>
+
+      <button id="finish-button" type="submit">Finish Setup</button>
+      <p class="privacy-note">🔒 Your API key stays on your device.</p>
+      <p id="status-message" class="status-message"></p>
+    </form>
+  </div>
+
+  <script src="setup.js"></script>
+</body>
+</html>

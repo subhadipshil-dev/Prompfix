@@ -1,0 +1,124 @@
+.prompfix-refine-button {
+  position: absolute;
+  z-index: 2147483647;
+  background: #7c3aed;
+  color: white;
+  border: none;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font: 13px Inter, system-ui, sans-serif;
+  cursor: pointer;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.35);
+}
+
+.prompfix-panel {
+  position: absolute;
+  z-index: 2147483647;
+  width: min(420px, calc(100vw - 24px));
+  max-height: min(90vh, 720px);
+  background: #111827;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.45);
+  padding: 18px;
+  display: grid;
+  gap: 12px;
+  color: #e2e8f0;
+}
+
+.prompfix-panel header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.prompfix-panel header h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.prompfix-panel header button {
+  border: none;
+  background: transparent;
+  color: #cbd5e1;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.prompfix-panel textarea,
+.prompfix-panel input,
+.prompfix-panel select {
+  width: 100%;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  background: #0f172a;
+  color: #e2e8f0;
+  padding: 12px 14px;
+  font: 0.95rem Inter, system-ui, sans-serif;
+}
+
+.prompfix-panel textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.prompfix-panel .button-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.prompfix-panel .primary-button,
+.prompfix-panel .secondary-button {
+  border: none;
+  border-radius: 14px;
+  padding: 12px 14px;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.prompfix-panel .primary-button {
+  background: #7c3aed;
+  color: white;
+}
+
+.prompfix-panel .secondary-button {
+  background: #1f2937;
+  color: #e2e8f0;
+}
+
+.prompfix-panel .status-text {
+  font-size: 0.88rem;
+  color: #94a3b8;
+}
+
+.prompfix-panel .output-box {
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  padding: 14px;
+  max-height: 220px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.prompfix-panel .hidden {
+  display: none;
+}
+
+.prompfix-panel .small-text {
+  color: #94a3b8;
+  font-size: 0.88rem;
+}
+
+.prompfix-panel .retry-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.prompfix-panel .retry-row button {
+  flex: 1;
+}

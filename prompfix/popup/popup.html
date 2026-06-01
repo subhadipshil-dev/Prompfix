@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prompfix</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div class="popup-shell">
+    <div class="header-row">
+      <div>
+        <h1>Prompfix</h1>
+        <p id="greeting">Refine prompts instantly.</p>
+      </div>
+      <div id="status-badge" class="status-badge">🔒 Your API key stays on your device.</div>
+    </div>
+
+    <label class="field-label">
+      Paste your rough prompt here…
+      <textarea id="input-prompt" placeholder="Paste your rough prompt here…"></textarea>
+    </label>
+
+    <div class="style-row" id="style-row">
+      <button type="button" data-style="Clearer" class="style-button active">Clearer</button>
+      <button type="button" data-style="More Detailed" class="style-button">More Detailed</button>
+      <button type="button" data-style="Shorter" class="style-button">Shorter</button>
+      <button type="button" data-style="Professional" class="style-button">Professional</button>
+      <button type="button" data-style="For Coding" class="style-button">For Coding</button>
+    </div>
+
+    <button id="refine-button" class="primary-button">Refine prompt</button>
+
+    <div class="result-grid">
+      <section>
+        <h2>Original</h2>
+        <pre id="original-text" class="result-box">No prompt yet.</pre>
+      </section>
+      <section>
+        <h2>Refined</h2>
+        <pre id="refined-text" class="result-box">Your refined prompt will appear here.</pre>
+      </section>
+    </div>
+
+    <div class="action-bar">
+      <button id="copy-button" class="secondary-button">Copy refined</button>
+      <span id="copy-feedback" class="copy-feedback"></span>
+    </div>
+
+    <div id="history-section" class="history-section hidden">
+      <div class="history-header">
+        <h3>Prompt history</h3>
+        <span id="history-count"></span>
+      </div>
+      <div id="history-list" class="history-list"></div>
+    </div>
+
+    <div id="notice" class="notice hidden"></div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
