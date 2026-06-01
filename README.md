@@ -65,6 +65,7 @@ prompfix/
 - Paste a prompt into the textarea.
 - Pick a refinement style and click `Refine prompt`.
 - Copy the refined result with the `Copy refined` button.
+- Use `Manage API keys` to update your provider selection or edit saved API keys.
 
 ### In-page refinement
 
@@ -75,7 +76,8 @@ prompfix/
 
 ## Notes
 
-- The extension currently uses OpenAI's `gpt-4o-mini` model.
+- The extension currently supports OpenAI, Gemini, OpenRouter, and Claude providers.
+- Gemini support uses a Google AI Studio API key stored locally, and you can choose the Gemini model available in your account.
 - The API key is never shared with any backend; it is used only for requests from the extension.
 - Prompt history is opt-in and stored locally.
 

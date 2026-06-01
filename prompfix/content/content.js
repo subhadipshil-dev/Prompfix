@@ -161,21 +161,7 @@ async function generateRefinement(commentMode = false, retry = false) {
   reRefineButton.disabled = true;
 
   try {
-    const result = await chrome.runtime.sendMessage({
-      action: 'refinePrompt',
-      payload: {
-        prompt,
-        mode,
-        style: 'Clearer',
-        comment: commentMode ? comment : ''
-      }
-    });
-
-    if (!result || !result.success) {
-      throw new Error(result?.error || 'API request failed.');
-    }
-
-    const refined = result.result.refined;
+    const refined = await fetchRefinement(prompt, mode, 'Clearer', commentMode ? comment : '');
     outputBox.textContent = refined;
     outputBox.classList.remove('hidden');
     setTargetText(activeTarget, refined);

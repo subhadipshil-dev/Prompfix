@@ -20,6 +20,12 @@ body {
   gap: 16px;
 }
 
+.popup-top-right {
+  display: grid;
+  gap: 10px;
+  justify-items: end;
+}
+
 .header-row h1 {
   margin: 0 0 6px;
   font-size: 1.5rem;
@@ -140,6 +146,12 @@ textarea {
 .secondary-button {
   background: #1f2937;
   color: #e2e8f0;
+}
+
+.small-button {
+  padding: 10px 12px;
+  font-size: 0.82rem;
+  min-width: 140px;
 }
 
 .copy-feedback {

@@ -6,10 +6,12 @@ const copyButton = document.getElementById('copy-button');
 const copyFeedback = document.getElementById('copy-feedback');
 const styleButtons = Array.from(document.querySelectorAll('.style-button'));
 const historySection = document.getElementById('history-section');
+const manageKeysButton = document.getElementById('manage-keys-button');
 const historyList = document.getElementById('history-list');
 const historyCount = document.getElementById('history-count');
 const notice = document.getElementById('notice');
 const greeting = document.getElementById('greeting');
+const reloadButton = document.getElementById('reload-extension');
 
 let selectedStyle = 'Clearer';
 let defaultMode = 'Balanced';
@@ -71,8 +73,15 @@ refineButton.addEventListener('click', async () => {
       addHistoryItem(prompt, result.refined);
     }
   } catch (error) {
-    notice.textContent = error.message || 'Unable to refine prompt right now.';
+    const errorMsg = error.message || 'Unable to refine prompt right now.';
+    notice.textContent = errorMsg;
     notice.classList.remove('hidden');
+    
+    if (errorMsg.includes('context') || errorMsg.includes('reload')) {
+      reloadButton.classList.remove('hidden');
+    } else {
+      reloadButton.classList.add('hidden');
+    }
   } finally {
     refineButton.textContent = 'Refine prompt';
     refineButton.disabled = false;
@@ -88,15 +97,8 @@ copyButton.addEventListener('click', async () => {
 });
 
 async function sendRefineRequest(prompt, mode, style) {
-  const response = await chrome.runtime.sendMessage({
-    action: 'refinePrompt',
-    payload: { prompt, mode, style }
-  });
-
-  if (!response || !response.success) {
-    throw new Error(response?.error || 'Refinement request failed');
-  }
-  return response.result;
+  const refined = await fetchRefinement(prompt, mode, style);
+  return { refined };
 }
 
 function renderHistory() {
@@ -130,5 +132,13 @@ function escapeHtml(value) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
 }
+
+manageKeysButton.addEventListener('click', () => {
+  chrome.tabs.create({ url: chrome.runtime.getURL('setup/setup.html') });
+});
+
+reloadButton.addEventListener('click', () => {
+  chrome.runtime.reload();
+});
 
 loadSettings();
