@@ -37,7 +37,7 @@ async function handleRefinement(request, sendResponse) {
     const provider = stored.apiProvider || 'OpenAI';
     const apiKeys = stored.apiKeys || {};
     const apiKey = apiKeys[provider];
-    const geminiModel = stored.geminiModel || 'gemini-2.0-flash-exp';
+    const geminiModel = stored.geminiModel || 'gemini-3.5-flash';
     
     if (!apiKey) {
       throw new Error(`Missing API key for ${provider}. Please open setup and add it.`);
@@ -108,14 +108,13 @@ function buildProviderRequest(provider, apiKey, modePrompt, stylePrompt, userMes
   const combinedPrompt = `${modePrompt}\n${stylePrompt}\n\nText to refine:\n${userMessage}`;
   
   if (provider === 'Gemini') {
-    const models = geminiModel ? [geminiModel] : ['gemini-2.0-flash-exp', 'gemini-1.5-flash', 'gemini-1.5-flash-8b'];
+    const models = geminiModel ? [geminiModel] : ['gemini-3.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
     return models.map((model) => ({
-      url: `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+      url: `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${apiKey}`,
       options: {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'x-goog-api-key': apiKey
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           contents: [{
