@@ -37,7 +37,7 @@ async function handleRefinement(request, sendResponse) {
     const provider = stored.apiProvider || 'OpenAI';
     const apiKeys = stored.apiKeys || {};
     const apiKey = apiKeys[provider];
-    const geminiModel = stored.geminiModel || 'gemini-2.5-flash-lite';
+    const geminiModel = stored.geminiModel || 'gemini-2.0-flash-exp';
     
     if (!apiKey) {
       throw new Error(`Missing API key for ${provider}. Please open setup and add it.`);
@@ -89,7 +89,6 @@ async function handleRefinement(request, sendResponse) {
       }
       
       const data = await response.json();
-      console.log(`${provider} response:`, data);
       const refined = extractResponseText(provider, data);
       if (!refined) {
         lastError = new Error(`${provider} returned an empty response.`);
@@ -109,27 +108,37 @@ function buildProviderRequest(provider, apiKey, modePrompt, stylePrompt, userMes
   const combinedPrompt = `${modePrompt}\n${stylePrompt}\n\nText to refine:\n${userMessage}`;
   
   if (provider === 'Gemini') {
-    const models = geminiModel ? [geminiModel] : ['gemini-2.5-flash-lite', 'gemini-3-flash-preview', 'gemini-3.1-flash-lite-preview'];
+    const models = geminiModel ? [geminiModel] : ['gemini-2.0-flash-exp', 'gemini-1.5-flash', 'gemini-1.5-flash-8b'];
     return models.map((model) => ({
-      url: `https://generativelanguage.googleapis.com/v1/models/${model}:generateText?key=${apiKey}`,
+      url: `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
       options: {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': apiKey
+        },
         body: JSON.stringify({
-          prompt: { text: combinedPrompt },
-          temperature: 0.8,
-          maxOutputTokens: 650
+          contents: [{
+            parts: [{
+              text: combinedPrompt
+            }]
+          }],
+          generationConfig: {
+            temperature: 0.8,
+            maxOutputTokens: 650
+          }
         })
       }
     }));
   } else if (provider === 'Claude') {
     return {
-      url: 'https://api.anthropic.com/v1/chat/completions',
+      url: 'https://api.anthropic.com/v1/messages',
       options: {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': apiKey
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01'
         },
         body: JSON.stringify({
           model: 'claude-3-5-sonnet-20241022',
@@ -176,14 +185,9 @@ function buildProviderRequest(provider, apiKey, modePrompt, stylePrompt, userMes
 
 function extractResponseText(provider, data) {
   if (provider === 'Gemini') {
-    return (
-      data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-      data?.candidates?.[0]?.content?.text ||
-      data?.candidates?.[0]?.output ||
-      ''
-    );
+    return data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
   } else if (provider === 'Claude') {
-    return data?.choices?.[0]?.message?.content || '';
+    return data?.content?.[0]?.text || '';
   } else {
     // OpenAI, OpenRouter
     return data?.choices?.[0]?.message?.content || '';
