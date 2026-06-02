@@ -1,17 +1,12 @@
 const inputPrompt = document.getElementById('input-prompt');
 const refineButton = document.getElementById('refine-button');
-const originalText = document.getElementById('original-text');
 const refinedText = document.getElementById('refined-text');
 const copyButton = document.getElementById('copy-button');
 const copyFeedback = document.getElementById('copy-feedback');
 const styleButtons = Array.from(document.querySelectorAll('.style-button'));
-const historySection = document.getElementById('history-section');
 const manageKeysButton = document.getElementById('manage-keys-button');
-const historyList = document.getElementById('history-list');
-const historyCount = document.getElementById('history-count');
 const notice = document.getElementById('notice');
-const greeting = document.getElementById('greeting');
-const reloadButton = document.getElementById('reload-extension');
+const statusModel = document.getElementById('status-model');
 
 let selectedStyle = 'Clearer';
 let defaultMode = 'Balanced';
@@ -24,11 +19,12 @@ async function loadSettings() {
     'firstName',
     'defaultMode',
     'saveHistory',
-    'promptHistory'
+    'promptHistory',
+    'apiProvider'
   ]);
 
   if (!stored.setupComplete) {
-    notice.textContent = 'Please finish setup before using Prompfix. The setup page should open automatically on install.';
+    notice.textContent = 'Please finish setup before using Prompfix.';
     notice.classList.remove('hidden');
     refineButton.disabled = true;
     return;
@@ -37,10 +33,10 @@ async function loadSettings() {
   defaultMode = stored.defaultMode || 'Balanced';
   saveHistory = stored.saveHistory || false;
   promptHistory = Array.isArray(stored.promptHistory) ? stored.promptHistory : [];
-  greeting.textContent = stored.firstName ? `Hello, ${stored.firstName}.` : 'Refine prompts instantly.';
-  if (promptHistory.length > 0 && saveHistory) {
-    renderHistory();
-    historySection.classList.remove('hidden');
+  
+  // Update status model display
+  if (stored.apiProvider) {
+    statusModel.textContent = `Model: ${stored.apiProvider}`;
   }
 }
 
@@ -64,7 +60,6 @@ refineButton.addEventListener('click', async () => {
   notice.classList.add('hidden');
   refineButton.textContent = 'Refining…';
   refineButton.disabled = true;
-  originalText.textContent = prompt;
 
   try {
     const result = await sendRefineRequest(prompt, defaultMode, selectedStyle);
@@ -76,21 +71,15 @@ refineButton.addEventListener('click', async () => {
     const errorMsg = error.message || 'Unable to refine prompt right now.';
     notice.textContent = errorMsg;
     notice.classList.remove('hidden');
-    
-    if (errorMsg.includes('context') || errorMsg.includes('reload')) {
-      reloadButton.classList.remove('hidden');
-    } else {
-      reloadButton.classList.add('hidden');
-    }
   } finally {
-    refineButton.textContent = 'Refine prompt';
+    refineButton.textContent = 'Refine Prompt';
     refineButton.disabled = false;
   }
 });
 
 copyButton.addEventListener('click', async () => {
   const text = refinedText.textContent.trim();
-  if (!text) return;
+  if (!text || text === 'Your refined prompt will appear here.') return;
   await navigator.clipboard.writeText(text);
   copyFeedback.textContent = 'Copied!';
   setTimeout(() => (copyFeedback.textContent = ''), 1200);
@@ -101,44 +90,14 @@ async function sendRefineRequest(prompt, mode, style) {
   return { refined };
 }
 
-function renderHistory() {
-  historyList.innerHTML = '';
-  const historyToShow = promptHistory.slice(-5).reverse();
-  historyCount.textContent = `(${historyToShow.length})`;
-
-  historyToShow.forEach((entry) => {
-    const item = document.createElement('div');
-    item.className = 'history-item';
-    item.innerHTML = `
-      <strong>${new Date(entry.timestamp).toLocaleString()}</strong>
-      <div>${escapeHtml(entry.input)}</div>
-      <div class="history-output">${escapeHtml(entry.output)}</div>
-    `;
-    historyList.appendChild(item);
-  });
-}
-
 function addHistoryItem(input, output) {
   const entry = { input, output, timestamp: Date.now() };
   promptHistory = [...(promptHistory || []), entry].slice(-20);
   chrome.storage.local.set({ promptHistory });
-  renderHistory();
-  historySection.classList.remove('hidden');
-}
-
-function escapeHtml(value) {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
 }
 
 manageKeysButton.addEventListener('click', () => {
   chrome.tabs.create({ url: chrome.runtime.getURL('setup/setup.html') });
-});
-
-reloadButton.addEventListener('click', () => {
-  chrome.runtime.reload();
 });
 
 loadSettings();

@@ -1,66 +1,86 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Prompfix</title>
+  <title>PromptRefine Extension</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="popup.css" />
 </head>
-<body>
-  <div class="popup-shell">
-    <div class="header-row">
-      <div>
-        <h1>Prompfix</h1>
-        <p id="greeting">Refine prompts instantly.</p>
+<body class="antialiased">
+  <!-- Popup Container -->
+  <div class="w-[380px] min-h-[560px] bg-background flex flex-col border border-outline-variant rounded-lg overflow-hidden shadow-2xl">
+    <!-- Header -->
+    <header class="bg-surface flex justify-between items-center w-full px-4 h-14 border-b border-outline-variant shrink-0">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary text-[20px]" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+        <h1 class="font-headline-md text-headline-md font-bold text-primary">PromptRefine</h1>
       </div>
-      <div class="popup-top-right">
-        <div id="status-badge" class="status-badge">🔒 Your API key stays on your device.</div>
-        <button id="manage-keys-button" class="secondary-button small-button">Manage API keys</button>
+      <button id="manage-keys-button" aria-label="Settings" class="w-8 h-8 flex items-center justify-center rounded hover:bg-surface-container-high transition-colors text-on-surface-variant hover:text-on-surface">
+        <span class="material-symbols-outlined text-[20px]">settings</span>
+      </button>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-y-auto p-4 flex flex-col gap-5">
+      <!-- Input Section -->
+      <div class="flex flex-col gap-2">
+        <label class="font-label-md text-label-md text-on-surface" for="input-prompt">Your Prompt</label>
+        <div class="relative group">
+          <textarea 
+            id="input-prompt"
+            class="w-full h-32 bg-surface-container-low border border-outline-variant rounded-md p-3 font-code-sm text-code-sm text-on-background focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all resize-none shadow-inner" 
+            placeholder="Paste your prompt here..."></textarea>
+          <div class="absolute bottom-2 right-2 text-outline-variant font-code-sm text-[10px] pointer-events-none opacity-50">
+            Markdown supported
+          </div>
+        </div>
       </div>
-    </div>
 
-    <label class="field-label">
-      Paste your rough prompt here…
-      <textarea id="input-prompt" placeholder="Paste your rough prompt here…"></textarea>
-    </label>
-
-    <div class="style-row" id="style-row">
-      <button type="button" data-style="Clearer" class="style-button active">Clearer</button>
-      <button type="button" data-style="More Detailed" class="style-button">More Detailed</button>
-      <button type="button" data-style="Shorter" class="style-button">Shorter</button>
-      <button type="button" data-style="Professional" class="style-button">Professional</button>
-      <button type="button" data-style="For Coding" class="style-button">For Coding</button>
-    </div>
-
-    <button id="refine-button" class="primary-button">Refine prompt</button>
-
-    <div class="result-grid">
-      <section>
-        <h2>Original</h2>
-        <pre id="original-text" class="result-box">No prompt yet.</pre>
-      </section>
-      <section>
-        <h2>Refined</h2>
-        <pre id="refined-text" class="result-box">Your refined prompt will appear here.</pre>
-      </section>
-    </div>
-
-    <div class="action-bar">
-      <button id="copy-button" class="secondary-button">Copy refined</button>
-      <span id="copy-feedback" class="copy-feedback"></span>
-    </div>
-
-    <div id="history-section" class="history-section hidden">
-      <div class="history-header">
-        <h3>Prompt history</h3>
-        <span id="history-count"></span>
+      <!-- Style Selection Buttons -->
+      <div id="style-row" class="grid grid-cols-2 gap-2">
+        <button type="button" data-style="Clearer" class="style-button active py-2 px-3 rounded-md border border-outline-variant bg-surface-container text-on-surface font-label-md text-label-md hover:bg-surface-container-high transition-colors">Clearer</button>
+        <button type="button" data-style="More Detailed" class="style-button py-2 px-3 rounded-md border border-outline-variant bg-surface-container text-on-surface font-label-md text-label-md hover:bg-surface-container-high transition-colors">More Detailed</button>
+        <button type="button" data-style="Shorter" class="style-button py-2 px-3 rounded-md border border-outline-variant bg-surface-container text-on-surface font-label-md text-label-md hover:bg-surface-container-high transition-colors">Shorter</button>
+        <button type="button" data-style="Professional" class="style-button py-2 px-3 rounded-md border border-outline-variant bg-surface-container text-on-surface font-label-md text-label-md hover:bg-surface-container-high transition-colors">Professional</button>
       </div>
-      <div id="history-list" class="history-list"></div>
-    </div>
 
-    <div id="notice" class="notice hidden"></div>
-    <button id="reload-extension" class="secondary-button hidden" style="margin-top: 10px; width: 100%;">Reload extension</button>
+      <!-- CTA Button -->
+      <button id="refine-button" class="w-full bg-inverse-primary hover:brightness-110 active:scale-[0.98] text-white font-label-md text-label-md h-10 rounded-md transition-all duration-200 flex items-center justify-center gap-2 shadow-sm shrink-0">
+        <span class="material-symbols-outlined text-[18px]">magic_button</span>
+        Refine Prompt
+      </button>
+
+      <!-- Output Section -->
+      <div class="flex flex-col gap-2 flex-1">
+        <label class="font-label-md text-label-md text-on-surface">Refined Prompt</label>
+        <div class="relative group h-full min-h-[100px]">
+          <div class="absolute inset-0 bg-surface-container border border-outline-variant rounded-md p-3 font-code-sm text-code-sm text-secondary-fixed-dim overflow-y-auto leading-relaxed shadow-inner" id="refined-text">
+            Your refined prompt will appear here.
+          </div>
+          <!-- Copy Button (Visible on hover) -->
+          <button id="copy-button" aria-label="Copy code" class="absolute top-2 right-2 p-1.5 bg-surface-variant/80 backdrop-blur-md rounded border border-outline-variant text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:text-primary hover:bg-surface-container-highest z-10 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[16px]">content_copy</span>
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Status Bar -->
+    <footer class="h-10 px-4 border-t border-outline-variant bg-surface flex justify-between items-center shrink-0">
+      <div class="font-code-sm text-[11px] text-on-surface-variant flex items-center gap-1.5">
+        <span class="w-1.5 h-1.5 rounded-full bg-tertiary-container"></span>
+        <span id="status-model">Model: GPT-4o</span>
+      </div>
+      <div id="copy-feedback" class="font-code-sm text-[11px] text-on-surface-variant opacity-70"></div>
+    </footer>
+
+    <!-- Error/Notice Section -->
+    <div id="notice" class="hidden bg-error-container border-t border-error text-on-error p-3 text-center font-code-sm text-[12px]"></div>
   </div>
+
   <script src="../api.js"></script>
   <script src="popup.js"></script>
 </body>

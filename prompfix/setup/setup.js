@@ -1,113 +1,198 @@
-const form = document.getElementById('setup-form');
-const firstNameInput = document.getElementById('first-name');
+// Wizard state
+let currentStep = 1;
+const totalSteps = 5;
+
+// Form elements
+const displayNameInput = document.getElementById('display-name');
 const socialLinkInput = document.getElementById('social-link');
-const defaultModeInput = document.getElementById('default-mode');
-const apiProviderInput = document.getElementById('api-provider');
-const geminiModelLabel = document.getElementById('gemini-model-label');
-const geminiModelInput = document.getElementById('gemini-model');
+const apiProviderSelect = document.getElementById('api-provider');
 const apiKeyInput = document.getElementById('api-key');
 const toggleKeyButton = document.getElementById('toggle-key');
+const geminiModelContainer = document.getElementById('gemini-model-container');
+const geminiModelSelect = document.getElementById('gemini-model');
 const saveHistoryInput = document.getElementById('save-history');
-const statusMessage = document.getElementById('status-message');
+const modeButtons = document.querySelectorAll('.mode-button');
+const progressBar = document.getElementById('progress-bar');
+const currentStepDisplay = document.getElementById('current-step-display');
+const prevButton = document.getElementById('prev-button');
+const nextButton = document.getElementById('next-button');
 
-let storedApiKeys = {};
+let selectedMode = 'Basic';
 
-function getApiKeyHint(provider) {
-  switch (provider) {
-    case 'Gemini':
-      return 'Gemini: Google AI Studio API key (use the API key from your AI Studio project)';
-    case 'Claude':
-      return 'Claude: Anthropic API key';
-    case 'OpenRouter':
-      return 'OpenRouter: Bearer token';
-    default:
-      return 'OpenAI: sk-...';
-  }
+// Initialize
+window.addEventListener('DOMContentLoaded', () => {
+  loadSavedSettings();
+  setupEventListeners();
+  updateUI();
+});
+
+function setupEventListeners() {
+  // API Provider change
+  apiProviderSelect.addEventListener('change', (e) => {
+    toggleGeminiModelField(e.target.value);
+  });
+
+  // Toggle password visibility
+  toggleKeyButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    const isPassword = apiKeyInput.type === 'password';
+    apiKeyInput.type = isPassword ? 'text' : 'password';
+    toggleKeyButton.textContent = isPassword ? 'Hide' : 'Show';
+  });
+
+  // Mode selection
+  modeButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      modeButtons.forEach((b) => b.classList.remove('active'));
+      button.classList.add('active');
+      selectedMode = button.dataset.mode;
+    });
+  });
+
+  // Navigation buttons
+  prevButton.addEventListener('click', () => prevStep());
+  nextButton.addEventListener('click', () => nextStep());
 }
-
-window.addEventListener('DOMContentLoaded', async () => {
-  const stored = await chrome.storage.local.get([
-    'firstName',
-    'socialLink',
-    'defaultMode',
-    'apiProvider',
-    'saveHistory',
-    'apiKeys'
-  ]);
-
-  storedApiKeys = stored.apiKeys || {};
-  if (stored.firstName) firstNameInput.value = stored.firstName;
-  if (stored.socialLink) socialLinkInput.value = stored.socialLink;
-  if (stored.defaultMode) defaultModeInput.value = stored.defaultMode;
-  if (stored.apiProvider) apiProviderInput.value = stored.apiProvider;
-  if (stored.geminiModel) geminiModelInput.value = stored.geminiModel;
-  saveHistoryInput.checked = stored.saveHistory || false;
-
-  const provider = apiProviderInput.value || 'OpenAI';
-  apiKeyInput.value = storedApiKeys[provider] || '';
-  apiKeyHint.textContent = getApiKeyHint(provider);
-  toggleGeminiModelField(provider);
-});
-
-const apiKeyHint = document.getElementById('api-key-hint');
-
-apiProviderInput.addEventListener('change', () => {
-  const provider = apiProviderInput.value;
-  apiKeyInput.value = storedApiKeys[provider] || '';
-  apiKeyHint.textContent = getApiKeyHint(provider);
-  toggleGeminiModelField(provider);
-});
 
 function toggleGeminiModelField(provider) {
   if (provider === 'Gemini') {
-    geminiModelLabel.style.display = 'block';
+    geminiModelContainer.classList.remove('hidden');
   } else {
-    geminiModelLabel.style.display = 'none';
+    geminiModelContainer.classList.add('hidden');
   }
 }
 
-toggleKeyButton.addEventListener('click', () => {
-  const isPassword = apiKeyInput.type === 'password';
-  apiKeyInput.type = isPassword ? 'text' : 'password';
-  toggleKeyButton.textContent = isPassword ? 'Hide' : 'Show';
-});
+function loadSavedSettings() {
+  chrome.storage.local.get(
+    ['firstName', 'socialLink', 'apiProvider', 'defaultMode', 'saveHistory', 'geminiModel'],
+    (stored) => {
+      if (stored.firstName) displayNameInput.value = stored.firstName;
+      if (stored.socialLink) socialLinkInput.value = stored.socialLink;
+      if (stored.apiProvider) apiProviderSelect.value = stored.apiProvider;
+      if (stored.defaultMode) selectedMode = stored.defaultMode;
+      if (stored.geminiModel) geminiModelSelect.value = stored.geminiModel;
+      if (stored.saveHistory) saveHistoryInput.checked = true;
 
-form.addEventListener('submit', async (event) => {
-  event.preventDefault();
-  const firstName = firstNameInput.value.trim();
-  const socialLink = socialLinkInput.value.trim();
-  const defaultMode = defaultModeInput.value;
-  const apiProvider = apiProviderInput.value;
-  const apiKey = apiKeyInput.value.trim();
-  const geminiModel = geminiModelInput.value;
-  const saveHistory = saveHistoryInput.checked;
+      // Set active mode button
+      modeButtons.forEach((b) => {
+        b.classList.toggle('active', b.dataset.mode === selectedMode);
+        if (b.dataset.mode === selectedMode) {
+          b.classList.add('active');
+          const check = b.querySelector('.mode-check');
+          if (check) check.style.display = 'flex';
+        }
+      });
 
-  if (!firstName || !apiKey) {
-    statusMessage.textContent = 'Please fill in your name and API key.';
+      toggleGeminiModelField(apiProviderSelect.value);
+    }
+  );
+}
+
+function updateUI() {
+  // Update progress bar
+  const progress = (currentStep / totalSteps) * 100;
+  progressBar.style.width = progress + '%';
+  currentStepDisplay.textContent = currentStep;
+
+  // Show/hide steps
+  document.querySelectorAll('.step-container').forEach((step) => {
+    step.classList.remove('active', 'exit-left', 'exit-right');
+  });
+  document.getElementById(`step-${currentStep}`).classList.add('active');
+
+  // Update button visibility
+  prevButton.style.visibility = currentStep === 1 ? 'hidden' : 'visible';
+  if (currentStep === 5) {
+    nextButton.textContent = 'Close Setup';
+  } else {
+    nextButton.innerHTML = 'Continue <span class="material-symbols-outlined text-[18px]">arrow_forward</span>';
+  }
+}
+
+function nextStep() {
+  if (!validateCurrentStep()) {
     return;
   }
 
-  storedApiKeys[apiProvider] = apiKey;
+  if (currentStep < totalSteps) {
+    const currentStepEl = document.getElementById(`step-${currentStep}`);
+    currentStepEl.classList.add('exit-left');
 
-  const stored = await chrome.storage.local.get(['promptHistory']);
-  const promptHistory = Array.isArray(stored.promptHistory) ? stored.promptHistory : [];
+    currentStep++;
+    updateUI();
+  } else if (currentStep === totalSteps) {
+    finishSetup();
+  }
+}
+
+function prevStep() {
+  if (currentStep > 1) {
+    const currentStepEl = document.getElementById(`step-${currentStep}`);
+    currentStepEl.classList.add('exit-right');
+
+    currentStep--;
+    updateUI();
+  }
+}
+
+function validateCurrentStep() {
+  switch (currentStep) {
+    case 2: // Profile
+      if (!displayNameInput.value.trim()) {
+        alert('Please enter your display name.');
+        return false;
+      }
+      break;
+    case 3: // API Key
+      if (!apiKeyInput.value.trim()) {
+        alert('Please enter your API key.');
+        return false;
+      }
+      break;
+  }
+  return true;
+}
+
+async function finishSetup() {
+  if (!apiKeyInput.value.trim()) {
+    alert('Please provide an API key before finishing.');
+    return;
+  }
 
   const dataToSave = {
     setupComplete: true,
-    firstName,
-    socialLink,
-    defaultMode,
-    apiProvider,
-    apiKeys: storedApiKeys,
-    saveHistory,
-    promptHistory
+    firstName: displayNameInput.value.trim() || 'Developer',
+    socialLink: socialLinkInput.value.trim(),
+    apiProvider: apiProviderSelect.value,
+    defaultMode: selectedMode,
+    saveHistory: saveHistoryInput.checked,
+    promptHistory: []
   };
-  if (apiProvider === 'Gemini') {
-    dataToSave.geminiModel = geminiModel;
+
+  // Add API key
+  const storedKeys = await new Promise((resolve) => {
+    chrome.storage.local.get(['apiKeys'], (result) => {
+      resolve(result.apiKeys || {});
+    });
+  });
+
+  storedKeys[apiProviderSelect.value] = apiKeyInput.value.trim();
+  dataToSave.apiKeys = storedKeys;
+
+  // Add Gemini model if selected
+  if (apiProviderSelect.value === 'Gemini') {
+    dataToSave.geminiModel = geminiModelSelect.value;
   }
 
-  await chrome.storage.local.set(dataToSave);
+  await new Promise((resolve) => {
+    chrome.storage.local.set(dataToSave, resolve);
+  });
 
-  statusMessage.textContent = 'Setup complete — closing this tab now.';
-  setTimeout(() => window.close(), 700);
-});
+  // Close the setup tab
+  window.close();
+}
+
+// Global functions for onclick handlers
+window.nextStep = nextStep;
+window.prevStep = prevStep;
+window.finishSetup = finishSetup;
