@@ -1,193 +1,406 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Prompfix - Onboarding</title>
-  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="setup.css" />
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Prompfix - Onboarding</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "outline": "#928ea0",
+                      "on-surface-variant": "#c9c4d7",
+                      "primary-fixed": "#e4deff",
+                      "tertiary-container": "#cd7f1a",
+                      "surface-tint": "#c7bfff",
+                      "on-surface": "#e2e2eb",
+                      "on-secondary-fixed-variant": "#41455d",
+                      "surface-container-low": "#191b22",
+                      "on-tertiary": "#492900",
+                      "surface-container": "#1e1f26",
+                      "tertiary": "#ffb86d",
+                      "on-error-container": "#ffdad6",
+                      "inverse-primary": "#5a46d3",
+                      "surface-bright": "#373940",
+                      "on-tertiary-container": "#402300",
+                      "surface-dim": "#111319",
+                      "background": "#111319",
+                      "secondary-fixed-dim": "#c2c5e2",
+                      "secondary": "#c2c5e2",
+                      "error-container": "#93000a",
+                      "on-secondary-fixed": "#161a30",
+                      "secondary-container": "#444860",
+                      "inverse-on-surface": "#2e3037",
+                      "tertiary-fixed-dim": "#ffb86d",
+                      "tertiary-fixed": "#ffdcbd",
+                      "surface-container-lowest": "#0c0e14",
+                      "primary-container": "#8e7fff",
+                      "surface-variant": "#33343b",
+                      "on-background": "#e2e2eb",
+                      "on-primary-fixed": "#180065",
+                      "surface-container-highest": "#33343b",
+                      "inverse-surface": "#e2e2eb",
+                      "on-tertiary-fixed-variant": "#683c00",
+                      "on-secondary": "#2b2f46",
+                      "surface": "#111319",
+                      "primary-fixed-dim": "#c7bfff",
+                      "on-primary-fixed-variant": "#4228bb",
+                      "on-tertiary-fixed": "#2c1600",
+                      "error": "#ffb4ab",
+                      "on-primary-container": "#25008c",
+                      "secondary-fixed": "#dee1ff",
+                      "on-error": "#690005",
+                      "surface-container-high": "#282a30",
+                      "outline-variant": "#474554",
+                      "on-secondary-container": "#b3b7d3",
+                      "primary": "#c7bfff",
+                      "on-primary": "#2b009e"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "unit": "4px",
+                      "container-max": "1440px",
+                      "margin": "24px",
+                      "gutter": "16px"
+              },
+              "fontFamily": {
+                      "code-md": ["JetBrains Mono"],
+                      "code-sm": ["JetBrains Mono"],
+                      "headline-md": ["Inter"],
+                      "headline-lg": ["Inter"],
+                      "body-md": ["Inter"],
+                      "label-md": ["Inter"]
+              },
+              "fontSize": {
+                      "code-md": ["13px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "code-sm": ["12px", {"lineHeight": "18px", "fontWeight": "400"}],
+                      "headline-md": ["18px", {"lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}]
+              }
+      }
+          }
+        }
+      </script>
+<style>
+        body {
+            background-color: #0f1117;
+            color: #e2e2eb;
+            font-family: 'Inter', sans-serif;
+        }
+        .bg-layer-1 {
+            background-color: #1a1d27;
+            border: 1px solid #2d3148;
+        }
+        .accent-primary {
+            background-color: #7c6af7;
+            color: white;
+        }
+        .accent-primary:hover {
+            filter: brightness(1.1);
+        }
+        .input-ide {
+            background-color: #0f1117;
+            border: 1px solid #2d3148;
+            color: #e2e2eb;
+        }
+        .input-ide:focus {
+            border-color: #7c6af7;
+            outline: none;
+        }
+        .active-glow {
+            box-shadow: 0 0 15px rgba(124, 106, 247, 0.2);
+            border-color: #7c6af7 !important;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f1117;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2d3148;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #444860;
+        }
+        
+        .toggle-switch-container {
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .toggle-switch {
+            appearance: none;
+            width: 44px;
+            height: 24px;
+            background-color: #2d3148;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            transition: background-color 0.3s ease;
+            outline: none;
+        }
+        
+        .toggle-switch::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: white;
+            top: 2px;
+            left: 2px;
+            transition: left 0.3s ease;
+        }
+        
+        .toggle-switch:checked {
+            background-color: #7c6af7;
+        }
+        
+        .toggle-switch:checked::before {
+            left: 22px;
+        }
+    </style>
 </head>
-<body class="h-screen flex flex-col relative overflow-hidden">
-  <!-- Background glow effects -->
-  <div class="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-[#7c6af7] opacity-[0.03] blur-[120px] pointer-events-none z-0"></div>
-  <div class="fixed bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-[#7c6af7] opacity-[0.03] blur-[120px] pointer-events-none z-0"></div>
-
-  <!-- Top Progress Bar -->
-  <div class="fixed top-0 left-0 w-full z-50 bg-[#0f1117] bg-opacity-90 backdrop-blur-sm border-b border-[#2d3148]">
-    <div class="h-1 w-full bg-[#1a1d27]">
-      <div class="h-full bg-[#7c6af7] transition-all duration-500 w-[20%]" id="progress-bar"></div>
-    </div>
-    <div class="container mx-auto max-w-[640px] px-6 py-4 flex justify-between items-center">
-      <div class="flex items-center gap-2">
-        <span class="material-symbols-outlined text-[#7c6af7] text-[20px]">auto_awesome</span>
-        <span class="font-headline-md text-sm font-bold text-on-surface">Prompfix</span>
-      </div>
-      <div class="font-label-md text-sm text-on-surface-variant">
-        Step <span id="current-step-display">1</span> of 5
-      </div>
-    </div>
-  </div>
-
-  <!-- Main Content Area -->
-  <div class="flex-1 flex items-center justify-center pt-20 pb-24 overflow-y-auto z-10 w-full relative">
-    <div class="w-full max-w-[640px] px-6 relative h-full flex flex-col justify-center min-h-[500px]">
-      <!-- STEP 1: Welcome -->
-      <div class="step-container active flex flex-col items-center text-center" id="step-1">
-        <div class="inline-flex items-center justify-center w-24 h-24 rounded-2xl bg-layer-1 mb-8 logo-pulse active-glow border-[#7c6af7]">
-          <span class="material-symbols-outlined text-[#7c6af7]" style="font-size: 48px;">auto_awesome</span>
-        </div>
-        <h1 class="text-[40px] font-bold leading-tight tracking-tight mb-4 text-on-surface">Welcome to Prompfix</h1>
-        <p class="font-body-md text-lg text-on-surface-variant max-w-md mx-auto mb-10">Let's get your workspace configured for optimal AI interactions. This will take under a minute.</p>
-        <button type="button" class="accent-primary font-headline-md text-headline-md px-10 py-4 rounded-xl flex items-center gap-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_25px_rgba(124,106,247,0.3)] group" onclick="nextStep()">
-          Get Started
-          <span class="material-symbols-outlined transition-transform duration-300 group-hover:translate-x-1">arrow_forward</span>
-        </button>
-      </div>
-
-      <!-- STEP 2: Profile -->
-      <div class="step-container" id="step-2">
-        <section class="bg-layer-1 rounded-xl p-6 lg:p-8 w-full">
-          <div class="flex items-center gap-2 mb-6">
-            <span class="material-symbols-outlined text-outline-variant">person</span>
-            <h2 class="font-headline-md text-headline-md text-on-surface">Your Profile</h2>
-          </div>
-          <div class="flex flex-col gap-5">
-            <div class="flex flex-col gap-2">
-              <label class="font-label-md text-label-md text-on-surface-variant">Display Name</label>
-              <input class="input-ide rounded-lg px-3 py-3 font-body-md text-body-md w-full transition-colors" id="display-name" placeholder="Enter your name" type="text" />
-            </div>
-            <div class="flex flex-col gap-2">
-              <label class="font-label-md text-label-md text-on-surface-variant">Role / Social Link (Optional)</label>
-              <div class="relative">
-                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant text-[18px]">link</span>
-                <input class="input-ide rounded-lg pl-10 pr-3 py-3 font-body-md text-body-md w-full transition-colors" id="social-link" placeholder="https://github.com/..." type="url" />
-              </div>
-            </div>
-          </div>
-        </section>
-      </div>
-
-      <!-- STEP 3: API Key -->
-      <div class="step-container" id="step-3">
-        <section class="bg-layer-1 rounded-xl p-6 lg:p-8 w-full">
-          <div class="flex items-center justify-between mb-6">
-            <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-outline-variant">key</span>
-              <h2 class="font-headline-md text-headline-md text-on-surface">API Connection</h2>
-            </div>
-            <span class="bg-[#2d3148] text-[#64748b] font-label-md text-xs px-2 py-1 rounded-md">Local Storage Only</span>
-          </div>
-          <div class="flex flex-col gap-6">
-            <div class="flex flex-col gap-3">
-              <label class="font-label-md text-label-md text-on-surface-variant">API Provider</label>
-              <select id="api-provider" class="input-ide rounded-lg px-3 py-3 font-body-md text-body-md w-full transition-colors">
-                <option value="OpenAI">OpenAI</option>
-                <option value="Claude">Anthropic (Claude)</option>
-                <option value="Gemini">Google Gemini</option>
-                <option value="OpenRouter">OpenRouter</option>
-              </select>
-            </div>
-            <div class="flex flex-col gap-2">
-              <label class="font-label-md text-label-md text-on-surface-variant">API Key</label>
-              <div class="flex flex-col sm:flex-row gap-3">
-                <input class="input-ide rounded-lg px-3 py-3 font-code-md text-code-md w-full transition-colors flex-1" id="api-key" placeholder="sk-..." type="password" />
-                <button type="button" id="toggle-key" class="bg-[#2d3148] hover:bg-[#444860] text-on-surface font-label-md text-label-md px-4 py-3 rounded-lg transition-colors whitespace-nowrap border border-[#444860]">Show</button>
-              </div>
-            </div>
-            <div id="gemini-model-container" class="hidden flex flex-col gap-2">
-              <label class="font-label-md text-label-md text-on-surface-variant">Gemini Model</label>
-              <select id="gemini-model" class="input-ide rounded-lg px-3 py-3 font-body-md text-body-md w-full transition-colors">
-                <option value="gemini-3.5-flash">gemini-3.5-flash</option>
-                <option value="gemini-2.0-flash">gemini-2.0-flash</option>
-                <option value="gemini-1.5-flash">gemini-1.5-flash</option>
-                <option value="gemini-1.5-pro">gemini-1.5-pro</option>
-              </select>
-            </div>
-            <p class="font-body-md text-sm text-on-surface-variant flex items-start gap-2 bg-[#0f1117] p-3 rounded-lg border border-[#2d3148]">
-              <span class="material-symbols-outlined text-[18px] text-[#7c6af7] mt-0.5">lock</span>
-              Your keys are stored locally in your browser and never sent to our servers.
-            </p>
-          </div>
-        </section>
-      </div>
-
-      <!-- STEP 4: Preferences -->
-      <div class="step-container" id="step-4">
-        <div class="flex flex-col gap-6 w-full">
-          <section class="bg-layer-1 rounded-xl p-6">
-            <div class="flex items-center gap-2 mb-4">
-              <span class="material-symbols-outlined text-outline-variant">memory</span>
-              <h2 class="font-headline-md text-headline-md text-on-surface">Default Mode</h2>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <button type="button" class="mode-button bg-surface-container border-2 border-[#7c6af7] active-glow rounded-lg p-3 flex flex-col items-start gap-1 text-left relative overflow-hidden transition-all group" data-mode="Basic">
-                <div class="absolute top-0 right-0 w-6 h-6 bg-[#7c6af7] rounded-bl-lg flex items-center justify-center mode-check hidden">
-                  <span class="material-symbols-outlined text-white text-[14px]">check</span>
-                </div>
-                <span class="material-symbols-outlined text-[#7c6af7] text-[20px] mb-1">build</span>
-                <span class="font-label-md text-sm text-on-surface font-semibold">Basic</span>
-              </button>
-              <button type="button" class="mode-button bg-surface-container border border-[#2d3148] hover:border-[#444860] rounded-lg p-3 flex flex-col items-start gap-1 text-left transition-all group" data-mode="Balanced">
-                <span class="material-symbols-outlined text-outline-variant group-hover:text-on-surface transition-colors text-[20px] mb-1">tune</span>
-                <span class="font-label-md text-sm text-on-surface font-semibold">Balanced</span>
-              </button>
-              <button type="button" class="mode-button bg-surface-container border border-[#2d3148] hover:border-[#444860] rounded-lg p-3 flex flex-col items-start gap-1 text-left transition-all group" data-mode="Advanced">
-                <span class="material-symbols-outlined text-outline-variant group-hover:text-on-surface transition-colors text-[20px] mb-1">rocket</span>
-                <span class="font-label-md text-sm text-on-surface font-semibold">Advanced</span>
-              </button>
-            </div>
-          </section>
-          <section class="bg-layer-1 rounded-xl p-6">
-            <div class="flex items-center gap-2 mb-4">
-              <span class="material-symbols-outlined text-outline-variant">history</span>
-              <h2 class="font-headline-md text-headline-md text-on-surface">Data & Privacy</h2>
-            </div>
-            <label class="flex items-center gap-3 cursor-pointer">
-              <input id="save-history" type="checkbox" class="toggle-switch w-10 h-6 accent-[#7c6af7]" />
-              <div class="flex flex-col">
-                <span class="font-label-md text-sm text-on-surface font-semibold">Save Prompt History</span>
-                <span class="font-body-md text-xs text-on-surface-variant mt-0.5">Stored locally on this device</span>
-              </div>
-            </label>
-          </section>
-        </div>
-      </div>
-
-      <!-- STEP 5: Complete -->
-      <div class="step-container" id="step-5">
-        <div class="flex flex-col items-center text-center gap-8 py-8">
-          <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-[#2d3148] border-2 border-[#7c6af7]">
-            <span class="material-symbols-outlined text-[#7c6af7]" style="font-size: 40px; font-variation-settings: 'FILL' 1;">check_circle</span>
-          </div>
-          <div>
-            <h2 class="font-headline-lg text-headline-lg text-on-surface mb-2">All Set!</h2>
-            <p class="font-body-md text-body-md text-on-surface-variant max-w-md mx-auto">You're ready to start refining prompts. Click the button below to close this setup.</p>
-          </div>
-          <button type="button" class="accent-primary font-headline-md text-headline-md px-10 py-4 rounded-xl flex items-center gap-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_25px_rgba(124,106,247,0.3)]" onclick="finishSetup()">
-            Close Setup
-            <span class="material-symbols-outlined">done</span>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Bottom Navigation -->
-  <div class="fixed bottom-0 left-0 w-full z-40 bg-[#0f1117] border-t border-[#2d3148] bg-opacity-90 backdrop-blur-sm">
-    <div class="container mx-auto max-w-[640px] px-6 py-4 flex justify-between items-center gap-4">
-      <button type="button" id="prev-button" class="text-on-surface-variant hover:text-on-surface font-label-md text-label-md px-4 py-2 rounded-lg transition-colors flex items-center gap-2" onclick="prevStep()">
-        <span class="material-symbols-outlined text-[18px]">arrow_back</span>
-        Back
-      </button>
-      <button type="button" id="next-button" class="bg-[#7c6af7] text-white font-label-md text-label-md px-6 py-2.5 rounded-lg hover:brightness-110 transition-all duration-200 active-glow flex items-center gap-2" onclick="nextStep()">
-        Continue
-        <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
-      </button>
-    </div>
-  </div>
-
-  <script src="setup.js"></script>
-</body>
-</html>
+<body class="min-h-screen flex flex-col items-center pt-16 pb-24 overflow-x-hidden relative">
+<!-- Background glow effects -->
+<div class="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-[#7c6af7] opacity-[0.03] blur-[120px] pointer-events-none"></div>
+<div class="fixed bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-[#7c6af7] opacity-[0.03] blur-[120px] pointer-events-none"></div>
+<!-- Header Section -->
+<div class="text-center mb-16 z-10 max-w-2xl px-6 w-full">
+<div class="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-layer-1 mb-6 active-glow">
+<span class="material-symbols-outlined text-[#7c6af7]" style="font-size: 32px;">auto_awesome</span>
+</div>
+<h1 class="text-[36px] font-bold leading-tight tracking-tight mb-3 text-on-surface">Welcome to Prompfix</h1>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-md mx-auto">Let's get your workspace configured. This will take under a minute.</p>
+</div>
+<!-- Main Content Grid -->
+<div class="container max-w-container-max mx-auto px-6 lg:px-margin z-10 w-full max-w-[1100px]">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+<!-- Left Column: Form Setup -->
+<div class="lg:col-span-7 flex flex-col gap-8">
+<!-- 1. Profile Section -->
+<section class="bg-layer-1 rounded-xl p-6 lg:p-8">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-outline-variant">person</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Your Profile</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant">Display Name</label>
+<input class="input-ide rounded-lg px-3 py-2.5 font-body-md text-body-md w-full transition-colors" id="display-name" placeholder="Enter your name" type="text" value="Developer"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant">Role / Social Link</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant text-[18px]">link</span>
+<input class="input-ide rounded-lg pl-9 pr-3 py-2.5 font-body-md text-body-md w-full transition-colors" id="social-link" placeholder="https://..." type="text" value="github.com/dev"/>
+</div>
+</div>
+</div>
+</section>
+<!-- 2. API Key Section -->
+<section class="bg-layer-1 rounded-xl p-6 lg:p-8">
+<div class="flex items-center justify-between mb-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline-variant">key</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">API Connection</h2>
+</div>
+<span class="bg-[#2d3148] text-[#64748b] font-label-md text-label-md px-2 py-1 rounded-md">Local Storage Only</span>
+</div>
+<div class="flex flex-col gap-4">
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant">API Provider</label>
+<select id="api-provider" class="input-ide rounded-lg px-3 py-2.5 font-body-md text-body-md w-full transition-colors">
+<option value="OpenAI">OpenAI</option>
+<option value="Claude">Anthropic (Claude)</option>
+<option value="Gemini">Google Gemini</option>
+<option value="OpenRouter">OpenRouter</option>
+</select>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant">API Key</label>
+<div class="flex gap-3">
+<input class="input-ide rounded-lg px-3 py-2.5 font-code-md text-code-md w-full transition-colors flex-1" id="api-key" placeholder="sk-..." type="password" value="sk-proj-xxxxxxxxxxxxxxxxxxxxxxxx"/>
+<button id="toggle-key" type="button" class="bg-[#2d3148] hover:bg-[#444860] text-on-surface font-label-md text-label-md px-4 py-2 rounded-lg transition-colors whitespace-nowrap border border-[#444860]">Show</button>
+</div>
+</div>
+<div id="gemini-model-container" class="hidden flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant">Gemini Model</label>
+<select id="gemini-model" class="input-ide rounded-lg px-3 py-2.5 font-body-md text-body-md w-full transition-colors">
+<option value="gemini-3.5-flash">gemini-3.5-flash</option>
+<option value="gemini-2.0-flash">gemini-2.0-flash</option>
+<option value="gemini-1.5-flash">gemini-1.5-flash</option>
+<option value="gemini-1.5-pro">gemini-1.5-pro</option>
+</select>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant text-[13px] flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">lock</span>
+Your keys are stored locally in your browser and never sent to our servers.
+</p>
+</div>
+</section>
+<!-- 3. AI Model Selector -->
+<section class="bg-layer-1 rounded-xl p-6 lg:p-8">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-outline-variant">memory</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Default Model</h2>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+<button type="button" class="model-button bg-surface-container border-2 border-[#7c6af7] active-glow rounded-lg p-4 flex flex-col items-start gap-2 text-left relative overflow-hidden transition-all group" data-model="GPT-4o">
+<div class="absolute top-0 right-0 w-8 h-8 bg-[#7c6af7] rounded-bl-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-[16px]">check</span>
+</div>
+<span class="material-symbols-outlined text-[#7c6af7] mb-1">psychology</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold">GPT-4o</span>
+<span class="font-body-md text-body-md text-on-surface-variant text-xs">Best all-rounder</span>
+</button>
+<button type="button" class="model-button bg-surface-container border border-[#2d3148] hover:border-[#444860] rounded-lg p-4 flex flex-col items-start gap-2 text-left transition-all group" data-model="Claude 3.5">
+<span class="material-symbols-outlined text-outline-variant group-hover:text-on-surface transition-colors mb-1">smart_toy</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold">Claude 3.5 Sonnet</span>
+<span class="font-body-md text-body-md text-on-surface-variant text-xs">Best for coding</span>
+</button>
+<button type="button" class="model-button bg-surface-container border border-[#2d3148] hover:border-[#444860] rounded-lg p-4 flex flex-col items-start gap-2 text-left transition-all group" data-model="Gemini 1.5">
+<span class="material-symbols-outlined text-outline-variant group-hover:text-on-surface transition-colors mb-1">token</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold">Gemini 1.5 Pro</span>
+<span class="font-body-md text-body-md text-on-surface-variant text-xs">Large context</span>
+</button>
+</div>
+</section>
+<!-- 4. Refinement Style -->
+<section class="bg-layer-1 rounded-xl p-6 lg:p-8">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-outline-variant">tune</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Default Refinement Style</h2>
+</div>
+<div class="flex flex-col gap-3">
+<button type="button" class="style-button bg-surface-container border border-[#2d3148] border-l-4 border-l-[#7c6af7] rounded-lg p-4 flex items-center justify-between text-left transition-all group" data-style="Concise">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-semibold mb-1">Concise &amp; Direct</span>
+<span class="font-body-md text-body-md text-on-surface-variant text-xs">Strips fluff, keeps only essential instructions.</span>
+</div>
+<span class="material-symbols-outlined text-[#7c6af7]">radio_button_checked</span>
+</button>
+<button type="button" class="style-button bg-surface-container border border-[#2d3148] border-l-4 border-l-transparent hover:border-l-[#444860] rounded-lg p-4 flex items-center justify-between text-left transition-all group" data-style="Balanced">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-semibold mb-1">Balanced (Standard)</span>
+<span class="font-body-md text-body-md text-on-surface-variant text-xs">Improves clarity while maintaining original tone.</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant">radio_button_unchecked</span>
+</button>
+<button type="button" class="style-button bg-surface-container border border-[#2d3148] border-l-4 border-l-transparent hover:border-l-[#444860] rounded-lg p-4 flex items-center justify-between text-left transition-all group" data-style="Professional">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-semibold mb-1">Highly Professional</span>
+<span class="font-body-md text-body-md text-on-surface-variant text-xs">Formal tone, structured format, extremely detailed.</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant">radio_button_unchecked</span>
+</button>
+</div>
+</section>
+<!-- 5. History Toggle -->
+<section class="bg-layer-1 rounded-xl p-6 lg:p-8">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline-variant">history</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Save Prompt History</h2>
+</div>
+<label class="toggle-switch-container">
+<input type="checkbox" id="save-history" class="toggle-switch" />
+</label>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant text-xs mt-3">Keep a local history of your refined prompts for future reference.</p>
+</section>
+</div>
+<!-- Right Column: Live Preview -->
+<div class="lg:col-span-5 hidden lg:block relative">
+<div class="sticky top-24">
+<div class="flex items-center gap-2 mb-4 px-2">
+<span class="material-symbols-outlined text-outline-variant text-[18px]">visibility</span>
+<h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Live Preview</h3>
+</div>
+<!-- Extension Replica -->
+<div class="w-full max-w-[380px] bg-[#1a1d27] rounded-xl border border-[#2d3148] shadow-2xl overflow-hidden flex flex-col h-[600px] relative">
+<!-- TopBar -->
+<div class="h-12 border-b border-[#2d3148] flex justify-between items-center px-4 bg-[#1a1d27]">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#7c6af7] text-[18px]">auto_awesome</span>
+<span class="font-headline-md text-label-md font-bold text-on-surface">Prompfix</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="font-label-md text-[11px] text-outline-variant" id="preview-name">Developer</span>
+<div class="w-6 h-6 rounded bg-[#2d3148] flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant">person</span>
+</div>
+</div>
+</div>
+<!-- Editor Canvas -->
+<div class="flex-1 p-4 bg-[#0f1117] flex flex-col gap-4 relative">
+<div class="flex justify-between items-center">
+<div class="bg-[#2d3148] rounded px-2 py-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px] text-outline-variant">psychology</span>
+<span class="font-code-sm text-[10px] text-on-surface-variant" id="preview-model">GPT-4o</span>
+</div>
+<div class="bg-[#2d3148] rounded px-2 py-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px] text-outline-variant">tune</span>
+<span class="font-code-sm text-[10px] text-on-surface-variant" id="preview-style">Concise</span>
+</div>
+</div>
+<!-- Dummy Prompt Area -->
+<div class="flex-1 border border-[#2d3148] rounded-lg p-3 bg-[#1a1d27] font-code-md text-code-sm text-on-surface-variant relative overflow-hidden">
+<div class="text-[#444860] absolute left-3 top-3 bottom-3 border-r border-[#2d3148] pr-2 flex flex-col text-right w-6 select-none">
+<span>1</span><span>2</span><span>3</span><span>4</span>
+</div>
+<div class="pl-10">
+<span class="text-[#7c6af7]">System</span>: Act as a senior developer.<br/><br/>
+<span class="text-[#ffb86d]">User</span>: Create a python script that parses log files and outputs a CSV...
+</div>
+<!-- Floating Action Button replica -->
+<div class="absolute bottom-3 right-3 w-8 h-8 rounded-full bg-[#7c6af7] flex items-center justify-center shadow-lg">
+<span class="material-symbols-outlined text-white text-[16px]">bolt</span>
+</div>
+</div>
+</div>
+<!-- Bottom Bar -->
+<div class="h-10 border-t border-[#2d3148] flex justify-between items-center px-4 bg-[#1a1d27]">
+<span class="font-code-sm text-[10px] text-outline-variant">Tokens: ~420</span>
+<div class="flex gap-2">
+<span class="material-symbols-outlined text-[14px] text-outline-variant">history</span>
+<span class="material-symbols-outlined text-[14px] text-outline-variant">settings</span>
+</div>
+</div>
+<!-- Overlay reflection effect -->
+<div class="absolute inset-0 bg-gradient-to-tr from-transparent via-[rgba(255,255,255,0.02)] to-transparent pointer-events-none"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer CTA -->
+<div class="mt-16 w-full flex flex-col items-center justify-center z-10 px-6 pb-12">
+<button id="finish-button" type="button" class="accent-primary font-headline-md text-headline-md px-10 py-4 rounded-xl flex items-center gap-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_25px_rgba(124,106,247,0.3)] group">
+Launch Prompfix
+<span class="material-symbols-outlined transition-transform duration-300 group-hover:translate-x-1">arrow_forward</span>
+</button>
+<p class="font-label-md text-label-md text-outline-variant mt-6 text-center">
+You can always change these settings later in the extension preferences.
+</p>
+</div>
+<script src="setup.js"></script>
+</body></html>
