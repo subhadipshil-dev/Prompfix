@@ -1,4 +1,4 @@
-// Wizard state
+// Prompfix Setup Wizard
 let currentStep = 1;
 const totalSteps = 5;
 
@@ -11,13 +11,12 @@ const toggleKeyButton = document.getElementById('toggle-key');
 const geminiModelContainer = document.getElementById('gemini-model-container');
 const geminiModelSelect = document.getElementById('gemini-model');
 const saveHistoryInput = document.getElementById('save-history');
-const modeButtons = document.querySelectorAll('.mode-button');
-const progressBar = document.getElementById('progress-bar');
-const currentStepDisplay = document.getElementById('current-step-display');
+const progressFill = document.getElementById('progress-fill');
 const prevButton = document.getElementById('prev-button');
 const nextButton = document.getElementById('next-button');
 
-let selectedMode = 'Basic';
+let selectedModel = 'GPT-4o';
+let selectedStyle = 'Concise';
 
 // Initialize
 window.addEventListener('DOMContentLoaded', () => {
@@ -28,37 +27,58 @@ window.addEventListener('DOMContentLoaded', () => {
 
 function setupEventListeners() {
   // API Provider change
-  apiProviderSelect.addEventListener('change', (e) => {
-    toggleGeminiModelField(e.target.value);
-  });
+  if (apiProviderSelect) {
+    apiProviderSelect.addEventListener('change', (e) => {
+      toggleGeminiModelField(e.target.value);
+    });
+  }
 
   // Toggle password visibility
-  toggleKeyButton.addEventListener('click', (e) => {
-    e.preventDefault();
-    const isPassword = apiKeyInput.type === 'password';
-    apiKeyInput.type = isPassword ? 'text' : 'password';
-    toggleKeyButton.textContent = isPassword ? 'Hide' : 'Show';
+  if (toggleKeyButton) {
+    toggleKeyButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      const isPassword = apiKeyInput.type === 'password';
+      apiKeyInput.type = isPassword ? 'text' : 'password';
+      toggleKeyButton.textContent = isPassword ? 'Hide' : 'Show';
+    });
+  }
+
+  // Model selection
+  document.querySelectorAll('.model-card').forEach((card) => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.model-card').forEach((c) => c.classList.remove('active'));
+      card.classList.add('active');
+      selectedModel = card.dataset.model;
+    });
   });
 
-  // Mode selection
-  modeButtons.forEach((button) => {
-    button.addEventListener('click', () => {
-      modeButtons.forEach((b) => b.classList.remove('active'));
-      button.classList.add('active');
-      selectedMode = button.dataset.mode;
+  // Style selection
+  document.querySelectorAll('.style-item').forEach((item) => {
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.style-item').forEach((i) => i.classList.remove('active'));
+      item.classList.add('active');
+      selectedStyle = item.dataset.style;
     });
   });
 
   // Navigation buttons
-  prevButton.addEventListener('click', () => prevStep());
-  nextButton.addEventListener('click', () => nextStep());
+  if (prevButton) {
+    prevButton.addEventListener('click', () => prevStep());
+  }
+  if (nextButton) {
+    nextButton.addEventListener('click', () => nextStep());
+  }
+
+  // Finish button
+  const finishButton = document.getElementById('finish-button');
+  if (finishButton) {
+    finishButton.addEventListener('click', finishSetup);
+  }
 }
 
 function toggleGeminiModelField(provider) {
-  if (provider === 'Gemini') {
-    geminiModelContainer.classList.remove('hidden');
-  } else {
-    geminiModelContainer.classList.add('hidden');
+  if (geminiModelContainer) {
+    geminiModelContainer.style.display = provider === 'Gemini' ? 'block' : 'none';
   }
 }
 
@@ -66,24 +86,31 @@ function loadSavedSettings() {
   chrome.storage.local.get(
     ['firstName', 'socialLink', 'apiProvider', 'defaultMode', 'saveHistory', 'geminiModel'],
     (stored) => {
-      if (stored.firstName) displayNameInput.value = stored.firstName;
-      if (stored.socialLink) socialLinkInput.value = stored.socialLink;
-      if (stored.apiProvider) apiProviderSelect.value = stored.apiProvider;
-      if (stored.defaultMode) selectedMode = stored.defaultMode;
-      if (stored.geminiModel) geminiModelSelect.value = stored.geminiModel;
-      if (stored.saveHistory) saveHistoryInput.checked = true;
+      if (stored.firstName && displayNameInput) displayNameInput.value = stored.firstName;
+      if (stored.socialLink && socialLinkInput) socialLinkInput.value = stored.socialLink;
+      if (stored.apiProvider && apiProviderSelect) apiProviderSelect.value = stored.apiProvider;
+      if (stored.defaultMode) selectedStyle = stored.defaultMode;
+      if (stored.geminiModel && geminiModelSelect) geminiModelSelect.value = stored.geminiModel;
+      if (stored.saveHistory && saveHistoryInput) saveHistoryInput.checked = true;
 
-      // Set active mode button
-      modeButtons.forEach((b) => {
-        b.classList.toggle('active', b.dataset.mode === selectedMode);
-        if (b.dataset.mode === selectedMode) {
-          b.classList.add('active');
-          const check = b.querySelector('.mode-check');
-          if (check) check.style.display = 'flex';
-        }
+      // Set active model
+      if (stored.defaultMode) {
+        document.querySelectorAll('.model-card').forEach((card) => {
+          if (card.dataset.model === stored.defaultMode) {
+            card.classList.add('active');
+            selectedModel = stored.defaultMode;
+          } else {
+            card.classList.remove('active');
+          }
+        });
+      }
+
+      // Set active style
+      document.querySelectorAll('.style-item').forEach((item) => {
+        item.classList.toggle('active', item.dataset.style === selectedStyle);
       });
 
-      toggleGeminiModelField(apiProviderSelect.value);
+      toggleGeminiModelField(apiProviderSelect?.value || 'OpenAI');
     }
   );
 }
@@ -91,21 +118,47 @@ function loadSavedSettings() {
 function updateUI() {
   // Update progress bar
   const progress = (currentStep / totalSteps) * 100;
-  progressBar.style.width = progress + '%';
-  currentStepDisplay.textContent = currentStep;
+  if (progressFill) {
+    progressFill.style.width = progress + '%';
+  }
+
+  // Update step indicators
+  document.querySelectorAll('.progress-step').forEach((step, index) => {
+    const stepNum = index + 1;
+    step.classList.remove('active', 'completed');
+    if (stepNum < currentStep) {
+      step.classList.add('completed');
+    } else if (stepNum === currentStep) {
+      step.classList.add('active');
+    }
+  });
 
   // Show/hide steps
-  document.querySelectorAll('.step-container').forEach((step) => {
-    step.classList.remove('active', 'exit-left', 'exit-right');
+  document.querySelectorAll('.step-container').forEach((step, index) => {
+    step.classList.toggle('active', index + 1 === currentStep);
   });
-  document.getElementById(`step-${currentStep}`).classList.add('active');
 
   // Update button visibility
-  prevButton.style.visibility = currentStep === 1 ? 'hidden' : 'visible';
-  if (currentStep === 5) {
-    nextButton.textContent = 'Close Setup';
-  } else {
-    nextButton.innerHTML = 'Continue <span class="material-symbols-outlined text-[18px]">arrow_forward</span>';
+  if (prevButton) {
+    prevButton.style.visibility = currentStep === 1 ? 'hidden' : 'visible';
+  }
+  
+  if (nextButton) {
+    if (currentStep === totalSteps) {
+      nextButton.style.display = 'none';
+    } else {
+      nextButton.style.display = 'flex';
+      nextButton.innerHTML = `
+        <span>${currentStep === totalSteps - 1 ? 'Finish' : 'Continue'}</span>
+        <span class="material-symbols-outlined">arrow_forward</span>
+      `;
+    }
+  }
+
+  // Hide navigation on completion screen
+  const setupNav = document.getElementById('setup-nav');
+  if (setupNav) {
+    setupNav.style.display = currentStep === totalSteps ? 'none' : 'flex';
   }
 }
 
@@ -115,21 +168,13 @@ function nextStep() {
   }
 
   if (currentStep < totalSteps) {
-    const currentStepEl = document.getElementById(`step-${currentStep}`);
-    currentStepEl.classList.add('exit-left');
-
     currentStep++;
     updateUI();
-  } else if (currentStep === totalSteps) {
-    finishSetup();
   }
 }
 
 function prevStep() {
   if (currentStep > 1) {
-    const currentStepEl = document.getElementById(`step-${currentStep}`);
-    currentStepEl.classList.add('exit-right');
-
     currentStep--;
     updateUI();
   }
@@ -137,15 +182,15 @@ function prevStep() {
 
 function validateCurrentStep() {
   switch (currentStep) {
-    case 2: // Profile
-      if (!displayNameInput.value.trim()) {
-        alert('Please enter your display name.');
+    case 1: // Profile
+      if (!displayNameInput?.value.trim()) {
+        showError('Please enter your display name.');
         return false;
       }
       break;
-    case 3: // API Key
-      if (!apiKeyInput.value.trim()) {
-        alert('Please enter your API key.');
+    case 2: // API Key
+      if (!apiKeyInput?.value.trim()) {
+        showError('Please enter your API key.');
         return false;
       }
       break;
@@ -153,43 +198,92 @@ function validateCurrentStep() {
   return true;
 }
 
+function showError(message) {
+  // Remove any existing error
+  const existingError = document.querySelector('.setup-error');
+  if (existingError) {
+    existingError.remove();
+  }
+
+  // Create error element
+  const error = document.createElement('div');
+  error.className = 'setup-error';
+  error.style.cssText = `
+    padding: 12px 16px;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: 12px;
+    color: #fca5a5;
+    font-size: 13px;
+    margin-bottom: 16px;
+    animation: slideIn 0.3s ease;
+  `;
+  error.textContent = message;
+
+  const activeStep = document.querySelector('.step-container.active');
+  if (activeStep) {
+    activeStep.insertBefore(error, activeStep.firstChild);
+  }
+
+  // Auto-remove after 3 seconds
+  setTimeout(() => {
+    error.remove();
+  }, 3000);
+}
+
 async function finishSetup() {
-  if (!apiKeyInput.value.trim()) {
-    alert('Please provide an API key before finishing.');
+  if (apiKeyInput && !apiKeyInput.value.trim()) {
+    showError('Please provide an API key before finishing.');
     return;
   }
 
   const dataToSave = {
     setupComplete: true,
-    firstName: displayNameInput.value.trim() || 'Developer',
-    socialLink: socialLinkInput.value.trim(),
-    apiProvider: apiProviderSelect.value,
-    defaultMode: selectedMode,
-    saveHistory: saveHistoryInput.checked,
+    firstName: displayNameInput?.value.trim() || 'Developer',
+    socialLink: socialLinkInput?.value.trim() || '',
+    apiProvider: apiProviderSelect?.value || 'OpenAI',
+    defaultMode: selectedStyle,
+    saveHistory: saveHistoryInput?.checked || false,
     promptHistory: []
   };
 
   // Add API key
-  const storedKeys = await new Promise((resolve) => {
-    chrome.storage.local.get(['apiKeys'], (result) => {
-      resolve(result.apiKeys || {});
+  try {
+    const storedKeys = await new Promise((resolve) => {
+      chrome.storage.local.get(['apiKeys'], (result) => {
+        resolve(result.apiKeys || {});
+      });
     });
-  });
 
-  storedKeys[apiProviderSelect.value] = apiKeyInput.value.trim();
-  dataToSave.apiKeys = storedKeys;
+    storedKeys[dataToSave.apiProvider] = apiKeyInput?.value.trim() || '';
+    dataToSave.apiKeys = storedKeys;
 
-  // Add Gemini model if selected
-  if (apiProviderSelect.value === 'Gemini') {
-    dataToSave.geminiModel = geminiModelSelect.value;
+    // Add Gemini model if selected
+    if (dataToSave.apiProvider === 'Gemini' && geminiModelSelect) {
+      dataToSave.geminiModel = geminiModelSelect.value;
+    }
+
+    await new Promise((resolve) => {
+      chrome.storage.local.set(dataToSave, resolve);
+    });
+
+    // Show success and close
+    const finishButton = document.getElementById('finish-button');
+    if (finishButton) {
+      finishButton.innerHTML = `
+        <span class="material-symbols-outlined">check</span>
+        <span>Done!</span>
+      `;
+      finishButton.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+    }
+
+    setTimeout(() => {
+      window.close();
+    }, 1000);
+  } catch (error) {
+    console.error('Setup failed:', error);
+    showError('Failed to save settings. Please try again.');
   }
-
-  await new Promise((resolve) => {
-    chrome.storage.local.set(dataToSave, resolve);
-  });
-
-  // Close the setup tab
-  window.close();
 }
 
 // Global functions for onclick handlers

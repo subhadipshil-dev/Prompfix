@@ -1,118 +1,306 @@
+/* Prompfix Content Script Styles */
+
+/* === Floating Refine Button === */
 .prompfix-refine-button {
   position: absolute;
   z-index: 2147483647;
-  background: #7c3aed;
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
   color: white;
   border: none;
   border-radius: 999px;
-  padding: 8px 12px;
-  font: 13px Inter, system-ui, sans-serif;
+  padding: 10px 18px;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.35);
+  box-shadow: 
+    0 4px 16px rgba(124, 58, 237, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
+.prompfix-refine-button::before {
+  content: '✨';
+  font-size: 14px;
+}
+
+.prompfix-refine-button:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 
+    0 8px 24px rgba(124, 58, 237, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.15);
+}
+
+.prompfix-refine-button:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.prompfix-refine-button.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.9);
+}
+
+/* === Refinement Panel === */
 .prompfix-panel {
   position: absolute;
   z-index: 2147483647;
-  width: min(420px, calc(100vw - 24px));
-  max-height: min(90vh, 720px);
-  background: #111827;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
-  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.45);
-  padding: 18px;
-  display: grid;
-  gap: 12px;
+  width: min(440px, calc(100vw - 32px));
+  max-height: min(90vh, 800px);
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  border-radius: 24px;
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(124, 58, 237, 0.1),
+    0 0 60px rgba(124, 58, 237, 0.15);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
   color: #e2e8f0;
+  font-family: 'Inter', system-ui, sans-serif;
+  animation: panelSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
 }
 
+@keyframes panelSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Panel Header */
 .prompfix-panel header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(124, 58, 237, 0.1);
 }
 
 .prompfix-panel header h3 {
   margin: 0;
-  font-size: 1rem;
+  font-size: 16px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #c4b5fd 0%, #a78bfa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .prompfix-panel header button {
-  border: none;
-  background: transparent;
-  color: #cbd5e1;
-  font-size: 1.1rem;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  background: rgba(30, 41, 59, 0.5);
+  color: #94a3b8;
+  font-size: 18px;
+  line-height: 1;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
 }
 
+.prompfix-panel header button:hover {
+  background: rgba(124, 58, 237, 0.2);
+  color: white;
+  border-color: rgba(124, 58, 237, 0.4);
+  transform: rotate(90deg);
+}
+
+/* Panel Labels */
+.prompfix-panel label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
+  margin-bottom: 8px;
+}
+
+/* Panel Textarea/Input */
 .prompfix-panel textarea,
 .prompfix-panel input,
 .prompfix-panel select {
   width: 100%;
-  border: 1px solid #334155;
-  border-radius: 16px;
-  background: #0f172a;
-  color: #e2e8f0;
   padding: 12px 14px;
-  font: 0.95rem Inter, system-ui, sans-serif;
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(124, 58, 237, 0.15);
+  border-radius: 14px;
+  color: #f8fafc;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 13px;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
 }
 
 .prompfix-panel textarea {
-  min-height: 110px;
+  min-height: 100px;
   resize: vertical;
+  line-height: 1.6;
 }
 
+.prompfix-panel input::placeholder,
+.prompfix-panel textarea::placeholder {
+  color: #64748b;
+}
+
+.prompfix-panel textarea:focus,
+.prompfix-panel input:focus,
+.prompfix-panel select:focus {
+  outline: none;
+  border-color: rgba(124, 58, 237, 0.5);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+  background: rgba(30, 41, 59, 0.8);
+}
+
+/* Mode Selector */
+.prompfix-panel select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+}
+
+/* Button Row */
 .prompfix-panel .button-row {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
 
-.prompfix-panel .primary-button,
-.prompfix-panel .secondary-button {
+/* Primary Button */
+.prompfix-panel .primary-button {
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
   border: none;
   border-radius: 14px;
-  padding: 12px 14px;
-  cursor: pointer;
-  font-size: 0.95rem;
-}
-
-.prompfix-panel .primary-button {
-  background: #7c3aed;
   color: white;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
 }
 
+.prompfix-panel .primary-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
+}
+
+.prompfix-panel .primary-button:active {
+  transform: translateY(0);
+}
+
+.prompfix-panel .primary-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Secondary Button */
 .prompfix-panel .secondary-button {
-  background: #1f2937;
-  color: #e2e8f0;
+  padding: 12px 16px;
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  border-radius: 14px;
+  color: #cbd5e1;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
+.prompfix-panel .secondary-button:hover {
+  background: rgba(124, 58, 237, 0.1);
+  border-color: rgba(124, 58, 237, 0.4);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.prompfix-panel .secondary-button:active {
+  transform: translateY(0);
+}
+
+.prompfix-panel .secondary-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Status Text */
 .prompfix-panel .status-text {
-  font-size: 0.88rem;
+  font-size: 12px;
   color: #94a3b8;
+  line-height: 1.5;
 }
 
+.prompfix-panel .status-text.small-text {
+  font-size: 11px;
+  text-align: center;
+  opacity: 0.7;
+}
+
+/* Output Box */
 .prompfix-panel .output-box {
-  background: #0f172a;
-  border: 1px solid #334155;
-  border-radius: 16px;
-  padding: 14px;
-  max-height: 220px;
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px solid rgba(124, 58, 237, 0.1);
+  border-radius: 14px;
+  padding: 16px;
+  max-height: 240px;
   overflow-y: auto;
   white-space: pre-wrap;
   word-break: break-word;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #e2e8f0;
+  animation: fadeIn 0.4s ease;
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.prompfix-panel .output-box::-webkit-scrollbar {
+  width: 4px;
+}
+
+.prompfix-panel .output-box::-webkit-scrollbar-thumb {
+  background: rgba(124, 58, 237, 0.3);
+  border-radius: 2px;
+}
+
+/* Hidden */
 .prompfix-panel .hidden {
   display: none;
 }
 
-.prompfix-panel .small-text {
-  color: #94a3b8;
-  font-size: 0.88rem;
-}
-
+/* Retry Row */
 .prompfix-panel .retry-row {
   display: flex;
   justify-content: space-between;
@@ -121,4 +309,49 @@
 
 .prompfix-panel .retry-row button {
   flex: 1;
+}
+
+/* Comment Section */
+.prompfix-panel .comment-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Loading Spinner */
+.prompfix-panel .loading-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Scrollbar for panel */
+.prompfix-panel {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(124, 58, 237, 0.3) transparent;
+}
+
+.prompfix-panel::-webkit-scrollbar {
+  width: 6px;
+}
+
+.prompfix-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.prompfix-panel::-webkit-scrollbar-thumb {
+  background: rgba(124, 58, 237, 0.3);
+  border-radius: 3px;
+}
+
+.prompfix-panel::-webkit-scrollbar-thumb:hover {
+  background: rgba(124, 58, 237, 0.5);
 }
