@@ -16,25 +16,13 @@
         <div class="logo-icon">
           <span class="material-symbols-outlined">auto_awesome</span>
         </div>
-        <span class="logo-text">Prompfix</span>
-      </div>
-
-      <div class="transparency-controls">
-        <label class="transparency-label" for="transparency-slider">Transparency</label>
-        <div class="transparency-row">
-          <input
-            type="range"
-            id="transparency-slider"
-            min="40"
-            max="100"
-            step="1"
-            value="90"
-          />
-          <span class="transparency-value" id="transparency-value">90%</span>
+        <div>
+          <span class="logo-text">Prompfix</span>
+          <span class="provider-pill" id="header-provider">OpenAI</span>
         </div>
       </div>
 
-      <button class="settings-btn" id="manage-keys-button" title="Settings">
+      <button class="settings-btn" id="manage-keys-button" title="Settings &amp; API keys">
         <span class="material-symbols-outlined" style="font-size: 18px;">settings</span>
       </button>
     </header>
@@ -52,9 +40,18 @@
         ></textarea>
       </div>
 
-      <!-- Style Selector -->
+      <!-- Mode + Style -->
       <div>
-        <label class="pf-label">Refinement Style</label>
+        <label class="pf-label">Mode</label>
+        <div class="mode-selector" id="mode-selector">
+          <button class="mode-btn" data-mode="Basic">Basic</button>
+          <button class="mode-btn active" data-mode="Balanced">Balanced</button>
+          <button class="mode-btn" data-mode="Advanced">Advanced</button>
+        </div>
+      </div>
+
+      <div>
+        <label class="pf-label">Style</label>
         <div class="style-selector" id="style-selector">
           <button class="style-btn active" data-style="Clearer">
             <span>Clearer</span>
@@ -84,7 +81,7 @@
       <div class="pf-notice" id="notice"></div>
 
       <!-- Output Section -->
-      <div style="flex: 1; display: flex; flex-direction: column;">
+      <div class="output-section">
         <label class="pf-label">Refined Prompt</label>
         <div class="output-container">
           <div class="output-content" id="refined-text">

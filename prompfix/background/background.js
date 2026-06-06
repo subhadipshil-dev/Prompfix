@@ -1,17 +1,17 @@
-// API Mode Prompts
+// Mode Prompts (richer, professional instructions)
 const MODE_PROMPTS = {
-  Basic: 'Fix only grammar and spelling errors.',
-  Balanced: 'Improve clarity and structure while maintaining the original meaning.',
-  Advanced: 'Completely rewrite to be more impactful, clear, and well-structured.'
+  Basic: 'Fix grammar, spelling, punctuation, and verb usage only. Keep original wording as close as possible.',
+  Balanced: 'Improve grammar, sentence structure, and clarity. Rearrange if needed. Do not change the core meaning.',
+  Advanced: 'Rewrite the prompt entirely with stronger context, clearer structure, and a more complete instruction. Preserve the user\'s original intent.'
 };
 
 // Style Prompts
 const STYLE_PROMPTS = {
-  Clearer: 'Make it clear and easy to understand.',
-  'More Detailed': 'Add more detail and explanation.',
-  Shorter: 'Make it concise and brief.',
-  Professional: 'Use professional and formal language.',
-  'For Coding': 'Optimize for technical accuracy and code clarity.'
+  Clearer: 'Make the prompt easy to understand. Remove ambiguity.',
+  'More Detailed': 'Add useful context, specific details, and structure.',
+  Shorter: 'Remove unnecessary words. Keep it concise but complete.',
+  Professional: 'Improve the tone to be professional and polished.',
+  'For Coding': 'Rewrite as a clear, specific developer request with technical precision.'
 };
 
 chrome.runtime.onInstalled.addListener((details) => {

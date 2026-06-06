@@ -1,79 +1,200 @@
-const BUTTON_ID = 'prompfix-refine-button';
+const LOGO_ID = 'prompfix-logo';
 const PANEL_ID = 'prompfix-refine-panel';
+
 let activeTarget = null;
 let currentText = '';
 let panelElement = null;
-let buttonElement = null;
-let settings = { defaultMode: 'Balanced', saveHistory: false };
+let logoElement = null;
+let settings = { defaultMode: 'Balanced', saveHistory: false, apiProvider: 'OpenAI' };
 
 const MODE_NAMES = ['Basic', 'Balanced', 'Advanced'];
 
-// Create the floating refine button
-function createButton() {
-  if (buttonElement) return buttonElement;
-  
-  const button = document.createElement('button');
-  button.id = BUTTON_ID;
-  button.type = 'button';
-  button.className = 'prompfix-refine-button';
-  button.textContent = 'Refine';
-  button.style.display = 'none'; // Hidden by default
-  
-  button.addEventListener('click', (event) => {
-    event.stopPropagation();
-    event.preventDefault();
-    openPanel();
-  });
-  
-  // Prevent button from losing focus
-  button.addEventListener('mousedown', (e) => e.preventDefault());
-  
-  document.body.appendChild(button);
-  buttonElement = button;
-  return button;
+// Cool professional inline SVG logo mark (sparkle + refinement symbol)
+function getLogoSVG() {
+  return `
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <linearGradient id="pfGrad" x1="4" y1="4" x2="20" y2="20" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#ffffff" stop-opacity="0.95"/>
+          <stop offset="1" stop-color="#f0e7ff" stop-opacity="0.85"/>
+        </linearGradient>
+      </defs>
+      <!-- Outer refined shape hint -->
+      <rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/>
+      <!-- Main sparkle / refinement glyph -->
+      <path d="M12 5.2 L13.6 10.4 L19 12 L13.6 13.6 L12 18.8 L10.4 13.6 L5 12 L10.4 10.4 Z" fill="url(#pfGrad)"/>
+      <!-- Small accent dot for polish -->
+      <circle cx="17.2" cy="6.8" r="1.35" fill="#fff" fill-opacity="0.9"/>
+    </svg>
+  `;
 }
 
-// Position the button near the target element
-function positionButton(target) {
-  if (!target) return;
-  
-  const rect = target.getBoundingClientRect();
-  const button = createButton();
-  
-  // Position: right side of the input, vertically centered
-  const left = window.scrollX + rect.right - 110;
-  const top = window.scrollY + rect.top + (rect.height / 2) - 16;
-  
-  button.style.top = `${Math.max(8, top)}px`;
-  button.style.left = `${Math.max(8, left)}px`;
-  button.style.display = 'flex';
-  button.classList.remove('hidden');
-  
-  // Animate in
-  button.style.opacity = '0';
-  button.style.transform = 'scale(0.9)';
+// Create the draggable floating logo (replaces the old text button)
+function createLogo() {
+  if (logoElement) return logoElement;
+
+  const logo = document.createElement('div');
+  logo.id = LOGO_ID;
+  logo.className = 'prompfix-logo';
+  logo.innerHTML = getLogoSVG();
+  logo.title = 'Prompfix — Refine prompt';
+  logo.setAttribute('aria-label', 'Open Prompfix prompt refiner');
+
+  // Drag + click handling
+  makeDraggable(logo);
+
+  // Keyboard support
+  logo.setAttribute('tabindex', '0');
+  logo.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      openPanel();
+    }
+  });
+
+  document.body.appendChild(logo);
+  logoElement = logo;
+  return logo;
+}
+
+function makeDraggable(logo) {
+  let startClientX = 0;
+  let startClientY = 0;
+  let startLeft = 0;
+  let startTop = 0;
+  let hasMoved = false;
+  let pointerId = null;
+
+  const clamp = (val, min, max) => Math.max(min, Math.min(max, val));
+
+  function onPointerDown(e) {
+    if (e.button !== 0) return;
+    hasMoved = false;
+    pointerId = e.pointerId;
+
+    const rect = logo.getBoundingClientRect();
+    startLeft = rect.left;
+    startTop = rect.top;
+    startClientX = e.clientX;
+    startClientY = e.clientY;
+
+    logo.setPointerCapture(pointerId);
+    logo.classList.add('dragging');
+    e.preventDefault();
+  }
+
+  function onPointerMove(e) {
+    if (!logo.hasPointerCapture(e.pointerId)) return;
+
+    const dx = e.clientX - startClientX;
+    const dy = e.clientY - startClientY;
+
+    if (!hasMoved && (Math.abs(dx) > 4 || Math.abs(dy) > 4)) {
+      hasMoved = true;
+    }
+
+    let nextLeft = startLeft + dx;
+    let nextTop = startTop + dy;
+
+    const pad = 10;
+    const w = logo.offsetWidth;
+    const h = logo.offsetHeight;
+
+    nextLeft = clamp(nextLeft, pad, window.innerWidth - w - pad);
+    nextTop = clamp(nextTop, pad, window.innerHeight - h - pad);
+
+    logo.style.left = `${nextLeft}px`;
+    logo.style.top = `${nextTop}px`;
+  }
+
+  function onPointerUp(e) {
+    if (pointerId !== null && logo.hasPointerCapture(e.pointerId)) {
+      logo.releasePointerCapture(e.pointerId);
+    }
+    logo.classList.remove('dragging');
+    pointerId = null;
+
+    // Persist last user position
+    const r = logo.getBoundingClientRect();
+    logoPosition = { left: r.left, top: r.top };
+    hasUserDragged = true;
+
+    // If it was a clean click (little to no movement), open the panel
+    if (!hasMoved) {
+      openPanel();
+    }
+  }
+
+  logo.addEventListener('pointerdown', onPointerDown);
+  logo.addEventListener('pointermove', onPointerMove);
+  logo.addEventListener('pointerup', onPointerUp);
+  logo.addEventListener('lostpointercapture', () => {
+    logo.classList.remove('dragging');
+  });
+}
+
+// Remember last user-dragged position (session)
+let logoPosition = null;
+let hasUserDragged = false;
+
+function showLogo(target) {
+  const logo = createLogo();
+
+  if (hasUserDragged && logoPosition) {
+    // Respect where the user last placed it
+    logo.style.left = `${logoPosition.left}px`;
+    logo.style.top = `${logoPosition.top}px`;
+  } else if (target) {
+    // Smart initial placement near the field (right side, vertically centered)
+    const rect = target.getBoundingClientRect();
+    const logoW = 38;
+    const logoH = 38;
+
+    let left = window.scrollX + rect.right + 12;
+    let top = window.scrollY + rect.top + (rect.height / 2) - (logoH / 2);
+
+    // Keep inside viewport
+    const pad = 12;
+    left = Math.max(pad, Math.min(left, window.innerWidth - logoW - pad));
+    top = Math.max(pad, Math.min(top, window.innerHeight - logoH - pad));
+
+    logo.style.left = `${left}px`;
+    logo.style.top = `${top}px`;
+  } else {
+    // Safe default: bottom-right corner
+    logo.style.right = '20px';
+    logo.style.bottom = '20px';
+    logo.style.left = 'auto';
+    logo.style.top = 'auto';
+  }
+
+  logo.style.display = 'flex';
+  logo.style.opacity = '0';
+  logo.style.transform = 'scale(0.8)';
+
   requestAnimationFrame(() => {
-    button.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-    button.style.opacity = '1';
-    button.style.transform = 'scale(1)';
+    logo.style.transition = 'opacity 0.18s ease, transform 0.22s cubic-bezier(0.4,0,0.2,1)';
+    logo.style.opacity = '1';
+    logo.style.transform = 'scale(1)';
   });
 }
 
-// Hide the button with animation
-function hideButton() {
-  if (buttonElement) {
-    buttonElement.style.transition = 'all 0.2s ease';
-    buttonElement.style.opacity = '0';
-    buttonElement.style.transform = 'scale(0.9)';
+function hideLogo() {
+  if (logoElement) {
+    logoElement.style.transition = 'opacity 0.16s ease, transform 0.16s ease';
+    logoElement.style.opacity = '0';
+    logoElement.style.transform = 'scale(0.85)';
+
     setTimeout(() => {
-      if (buttonElement) {
-        buttonElement.style.display = 'none';
+      if (logoElement) {
+        logoElement.style.display = 'none';
+        logoElement.style.transform = 'scale(1)';
       }
-    }, 200);
+    }, 160);
   }
 }
 
-// Create the refinement panel
+// Create the refinement panel (professional glass panel)
 function createPanel() {
   removePanel();
   
@@ -82,39 +203,45 @@ function createPanel() {
   panel.className = 'prompfix-panel';
   panel.innerHTML = `
     <header>
-      <h3>Refine Prompt</h3>
+      <div class="panel-logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/>
+          <path d="M12 5.2 L13.6 10.4 L19 12 L13.6 13.6 L12 18.8 L10.4 13.6 L5 12 L10.4 10.4 Z" fill="#fff"/>
+          <circle cx="17.2" cy="6.8" r="1.35" fill="#fff" fill-opacity="0.9"/>
+        </svg>
+      </div>
+      <div class="panel-title">
+        <h3>Refine Prompt</h3>
+        <span class="panel-provider" id="panel-provider">${settings.apiProvider}</span>
+      </div>
       <button type="button" id="prompfix-close" title="Close">×</button>
     </header>
     
     <div>
       <label>Original Text</label>
-      <textarea id="prompfix-source" placeholder="Enter your prompt here..."></textarea>
+      <textarea id="prompfix-source" placeholder="Enter your prompt here..." spellcheck="false"></textarea>
     </div>
     
-    <div>
+    <div class="mode-row">
       <label>Mode</label>
       <select id="prompfix-mode"></select>
     </div>
     
     <div class="button-row">
-      <button type="button" class="primary-button" id="prompfix-generate">
-        <span style="display: flex; align-items: center; gap: 6px; justify-content: center;">
-          <span>Generate</span>
-        </span>
-      </button>
+      <button type="button" class="primary-button" id="prompfix-generate">Generate</button>
       <button type="button" class="secondary-button" id="prompfix-retry">Retry</button>
     </div>
     
-    <div class="status-text">Current mode: <strong id="current-mode-display">Balanced</strong></div>
+    <div class="status-text">Mode: <strong id="current-mode-display">Balanced</strong></div>
     
     <div class="comment-section">
-      <label>Additional Instructions (Optional)</label>
-      <input id="prompfix-comment" placeholder="e.g., Make it shorter, more formal, add examples..." />
-      <button type="button" class="secondary-button" id="prompfix-rerefine">Re-refine with Comment</button>
+      <label>Additional instructions (optional)</label>
+      <input id="prompfix-comment" placeholder="e.g. make it shorter, more formal, add examples..." />
+      <button type="button" class="secondary-button" id="prompfix-rerefine">Re-refine with this</button>
     </div>
     
     <div class="output-box hidden" id="prompfix-output"></div>
-    <div class="status-text small-text">Click outside to close</div>
+    <div class="status-text small-text">Press Esc or click outside to close</div>
   `;
 
   document.body.appendChild(panel);
@@ -196,6 +323,13 @@ function removePanel() {
       if (panelElement) {
         panelElement.remove();
         panelElement = null;
+
+        // Re-show the draggable logo after closing (if we still have context)
+        if (activeTarget && logoElement) {
+          logoElement.style.display = 'flex';
+          logoElement.style.opacity = '1';
+          logoElement.style.transform = 'scale(1)';
+        }
       }
     }, 200);
 
@@ -205,7 +339,7 @@ function removePanel() {
 
 function handleOutsideClick(event) {
   if (!panelElement) return;
-  if (!panelElement.contains(event.target) && event.target !== buttonElement) {
+  if (!panelElement.contains(event.target) && (!logoElement || event.target !== logoElement)) {
     removePanel();
   }
 }
@@ -221,6 +355,13 @@ function openPanel() {
   if (!activeTarget) return;
 
   currentText = getTargetText(activeTarget);
+
+  // Hide the floating logo while panel is visible (less clutter)
+  if (logoElement) {
+    logoElement.style.transition = 'opacity 0.12s ease';
+    logoElement.style.opacity = '0.15';
+  }
+
   const panel = createPanel();
 
   const outputBox = panel.querySelector('#prompfix-output');
@@ -283,11 +424,11 @@ async function generateRefinement(commentMode = false, retry = false) {
   setLoadingState(true, generateButton, retryButton, reRefineButton);
 
   try {
-    // Keep UI consistent: use selected mode as the refinement style argument.
+    // Use chosen mode + a solid default style for in-page refinements
     const refined = await fetchRefinement(
       prompt,
       mode,
-      mode,
+      'Clearer',
       commentMode ? comment : ''
     );
 
@@ -341,9 +482,10 @@ function escapeHtml(text) {
 
 async function loadSettings() {
   try {
-    const stored = await chrome.storage.local.get(['defaultMode', 'saveHistory']);
+    const stored = await chrome.storage.local.get(['defaultMode', 'saveHistory', 'apiProvider']);
     settings.defaultMode = stored.defaultMode || 'Balanced';
     settings.saveHistory = stored.saveHistory || false;
+    settings.apiProvider = stored.apiProvider || 'OpenAI';
   } catch (error) {
     console.error('Failed to load settings:', error);
   }
@@ -363,9 +505,9 @@ async function saveHistoryEntry(input, output) {
 function inspectFocus(event) {
   const target = event.target;
   
-  // Ignore if clicking inside panel or on button
+  // Ignore if clicking inside panel or on the logo
   if (!target || 
-      target.id === BUTTON_ID || 
+      target.id === LOGO_ID || 
       target.id === PANEL_ID || 
       (panelElement && panelElement.contains(target))) {
     return;
@@ -375,9 +517,12 @@ function inspectFocus(event) {
   if (editable) {
     activeTarget = target;
     currentText = getTargetText(target);
-    positionButton(target);
+    showLogo(target);
   } else {
-    hideButton();
+    // Only hide logo if user is not interacting with our UI
+    if (!panelElement) {
+      hideLogo();
+    }
   }
 }
 
@@ -394,8 +539,9 @@ function isEditableElement(element) {
 window.addEventListener('focusin', inspectFocus);
 
 window.addEventListener('scroll', () => {
-  if (activeTarget && !panelElement) {
-    positionButton(activeTarget);
+  if (activeTarget && !panelElement && logoElement && logoElement.style.display !== 'none' && !hasUserDragged) {
+    // Only auto-adjust logo position if user hasn't taken manual control
+    showLogo(activeTarget);
   }
   if (panelElement && activeTarget) {
     positionPanel(panelElement);
@@ -403,8 +549,18 @@ window.addEventListener('scroll', () => {
 }, { passive: true });
 
 window.addEventListener('resize', () => {
-  if (activeTarget && !panelElement) {
-    positionButton(activeTarget);
+  if (activeTarget && !panelElement && logoElement && logoElement.style.display !== 'none') {
+    // Keep logo on screen after resize
+    const r = logoElement.getBoundingClientRect();
+    const pad = 10;
+    const w = logoElement.offsetWidth;
+    const h = logoElement.offsetHeight;
+
+    let left = Math.max(pad, Math.min(r.left, window.innerWidth - w - pad));
+    let top = Math.max(pad, Math.min(r.top, window.innerHeight - h - pad));
+
+    logoElement.style.left = `${left}px`;
+    logoElement.style.top = `${top}px`;
   }
   if (panelElement) {
     positionPanel(panelElement);
@@ -413,11 +569,14 @@ window.addEventListener('resize', () => {
 
 // Initialize
 document.addEventListener('click', (event) => {
-  if (!activeTarget || event.target === buttonElement || (panelElement && panelElement.contains(event.target))) {
+  if (!activeTarget || (logoElement && event.target === logoElement) || (panelElement && panelElement.contains(event.target))) {
     return;
   }
   if (!isEditableElement(event.target)) {
-    hideButton();
+    // Don't aggressively hide if user might still want the logo
+    if (!hasUserDragged && logoElement) {
+      // leave it visible once activated
+    }
   }
 });
 

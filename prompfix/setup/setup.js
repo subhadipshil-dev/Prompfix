@@ -242,7 +242,7 @@ async function finishSetup() {
     firstName: displayNameInput?.value.trim() || 'Developer',
     socialLink: socialLinkInput?.value.trim() || '',
     apiProvider: apiProviderSelect?.value || 'OpenAI',
-    defaultMode: selectedStyle,
+    defaultMode: 'Balanced', // real runtime modes: Basic | Balanced | Advanced (setup styles are visual only for now)
     saveHistory: saveHistoryInput?.checked || false,
     promptHistory: []
   };

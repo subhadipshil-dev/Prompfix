@@ -1,45 +1,67 @@
 /* Prompfix Content Script Styles */
 
-/* === Floating Refine Button === */
-.prompfix-refine-button {
-  position: absolute;
+/* === Floating Logo (draggable professional control) === */
+.prompfix-logo {
+  position: fixed;
   z-index: 2147483647;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
   background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
-  color: white;
-  border: none;
-  border-radius: 999px;
-  padding: 10px 18px;
-  font-family: 'Inter', system-ui, sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.18), 0 0 0 1px rgba(255, 255, 255, 0.08);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  display: flex;
+  color: #fff;
+  display: none; /* shown via JS */
   align-items: center;
-  gap: 6px;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.32),
+              0 0 0 1px rgba(255, 255, 255, 0.12) inset,
+              0 1px 0 rgba(255,255,255,0.25) inset;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  transition: transform 0.22s cubic-bezier(0.25, 0.1, 0.25, 1),
+              box-shadow 0.22s cubic-bezier(0.25, 0.1, 0.25, 1),
+              opacity 0.18s ease;
+  border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
-.prompfix-refine-button::before {
-  content: '✨';
-  font-size: 14px;
+.prompfix-logo svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+  transition: transform 0.22s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
-.prompfix-refine-button:hover {
-  transform: translateY(-2px) scale(1.03);
-  box-shadow: 0 8px 18px rgba(124, 58, 237, 0.22), 0 0 0 1px rgba(255, 255, 255, 0.1);
+.prompfix-logo:hover {
+  box-shadow: 0 12px 32px rgba(124, 58, 237, 0.42),
+              0 0 0 1px rgba(255, 255, 255, 0.18) inset;
+  transform: translateY(-1px) scale(1.02);
 }
 
-.prompfix-refine-button:active {
-  transform: translateY(0) scale(0.98);
+.prompfix-logo:hover svg {
+  transform: rotate(8deg) scale(1.05);
 }
 
-.prompfix-refine-button.hidden {
-  opacity: 0;
-  pointer-events: none;
-  transform: scale(0.9);
+.prompfix-logo.dragging {
+  cursor: grabbing;
+  transform: scale(1.08);
+  box-shadow: 0 16px 38px rgba(124, 58, 237, 0.48),
+              0 0 0 1px rgba(255, 255, 255, 0.22) inset;
+  transition: none;
+}
+
+.prompfix-logo:active:not(.dragging) {
+  transform: scale(0.94);
+}
+
+/* Cool subtle idle glow (very light, performant) */
+.prompfix-logo {
+  animation: logoIdleGlow 3.2s ease-in-out infinite;
+}
+
+@keyframes logoIdleGlow {
+  0%, 100% { box-shadow: 0 8px 24px rgba(124, 58, 237, 0.32), 0 0 0 1px rgba(255, 255, 255, 0.12) inset; }
+  50% { box-shadow: 0 8px 28px rgba(124, 58, 237, 0.38), 0 0 0 1px rgba(255, 255, 255, 0.16) inset; }
 }
 
 /* === Refinement Panel === */
@@ -48,28 +70,28 @@
   z-index: 2147483647;
   width: min(440px, calc(100vw - 32px));
   max-height: min(90vh, 800px);
-  background: rgba(15, 23, 42, 0.95);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(124, 58, 237, 0.10);
-  border-radius: 24px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(124, 58, 237, 0.06);
-  padding: 20px;
+  background: #111319;
+  border: 1px solid rgba(124, 58, 237, 0.12);
+  border-radius: 16px;
+  box-shadow: 0 20px 48px -12px rgba(0, 0, 0, 0.55),
+              0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   color: #e2e8f0;
   font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  animation: panelSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: panelSlideIn 0.32s cubic-bezier(0.25, 0.1, 0.25, 1);
   overflow: hidden;
+  will-change: transform, opacity;
 }
 
 @keyframes panelSlideIn {
   from {
     opacity: 0;
-    transform: translateY(-10px) scale(0.98);
+    transform: translateY(-14px) scale(0.96);
   }
   to {
     opacity: 1;
@@ -77,23 +99,55 @@
   }
 }
 
-/* Panel Header */
+/* Panel Header - professional branded */
 .prompfix-panel header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 10px;
   padding-bottom: 12px;
   border-bottom: 1px solid rgba(124, 58, 237, 0.1);
 }
 
+.prompfix-panel .panel-logo {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(124, 58, 237, 0.3);
+}
+
+.prompfix-panel .panel-logo svg {
+  width: 15px;
+  height: 15px;
+}
+
+.prompfix-panel .panel-title {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
 .prompfix-panel header h3 {
   margin: 0;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
-  background: linear-gradient(135deg, #c4b5fd 0%, #a78bfa 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #f1e7ff;
+  line-height: 1.1;
+}
+
+.prompfix-panel .panel-provider {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: #8b7ad9;
+  text-transform: uppercase;
+  line-height: 1;
+  margin-top: 1px;
 }
 
 .prompfix-panel header button {
@@ -110,6 +164,7 @@
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 
 .prompfix-panel header button:focus-visible {
@@ -177,7 +232,22 @@
   box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.22);
 }
 
-/* Mode Selector */
+/* Mode row + Selector */
+.prompfix-panel .mode-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.prompfix-panel .mode-row label {
+  margin-bottom: 0;
+  white-space: nowrap;
+}
+
+.prompfix-panel .mode-row select {
+  flex: 1;
+}
+
 .prompfix-panel select {
   cursor: pointer;
   appearance: none;
@@ -370,4 +440,74 @@
 
 .prompfix-panel::-webkit-scrollbar-thumb:hover {
   background: rgba(124, 58, 237, 0.5);
+}
+
+/* === Cool smooth animations (performant: ONLY transform + opacity to avoid slowing the extension) === */
+
+/* Panel inner elements entrance */
+.prompfix-panel header,
+.prompfix-panel > div {
+  opacity: 0;
+  transform: translateY(6px);
+  animation: panelItemFade 0.28s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+
+.prompfix-panel header { animation-delay: 40ms; }
+.prompfix-panel > div:nth-of-type(1) { animation-delay: 70ms; }
+.prompfix-panel > div:nth-of-type(2) { animation-delay: 100ms; }
+.prompfix-panel .button-row { animation-delay: 130ms; }
+.prompfix-panel .status-text { animation-delay: 150ms; }
+.prompfix-panel .comment-section { animation-delay: 170ms; }
+
+@keyframes panelItemFade {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Output reveal (when .hidden is removed by JS) */
+.prompfix-panel .output-box:not(.hidden) {
+  animation: outputReveal 0.32s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+@keyframes outputReveal {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Primary/secondary buttons — cooler hover + press */
+.prompfix-panel .primary-button,
+.prompfix-panel .secondary-button {
+  transition: transform 0.18s cubic-bezier(0.25, 0.1, 0.25, 1),
+              box-shadow 0.18s cubic-bezier(0.25, 0.1, 0.25, 1),
+              background 0.18s ease;
+  will-change: transform;
+}
+
+.prompfix-panel .primary-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(124, 58, 237, 0.26);
+}
+
+.prompfix-panel .primary-button:active {
+  transform: scale(0.985);
+}
+
+.prompfix-panel .secondary-button:hover {
+  transform: translateY(-1px);
+  background: rgba(124, 58, 237, 0.14);
+  border-color: rgba(124, 58, 237, 0.35);
+}
+
+/* Loading state for generate button — smooth */
+.prompfix-panel .primary-button:disabled {
+  opacity: 0.85;
+  transform: none;
 }

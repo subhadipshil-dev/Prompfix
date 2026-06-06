@@ -4,19 +4,16 @@ const refinedText = document.getElementById('refined-text');
 const copyButton = document.getElementById('copy-button');
 const copyFeedback = document.getElementById('copy-feedback');
 const styleButtons = Array.from(document.querySelectorAll('.style-btn'));
+const modeButtons = Array.from(document.querySelectorAll('.mode-btn'));
 const manageKeysButton = document.getElementById('manage-keys-button');
 const notice = document.getElementById('notice');
 const statusModel = document.getElementById('status-model');
-
-const transparencySlider = document.getElementById('transparency-slider');
-const transparencyValue = document.getElementById('transparency-value');
+const headerProvider = document.getElementById('header-provider');
 
 let selectedStyle = 'Clearer';
-let defaultMode = 'Balanced';
+let selectedMode = 'Balanced';
 let saveHistory = false;
 let promptHistory = [];
-
-let popupTransparency = 0.90; // 40-100 range mapped to 0.40-1.00
 
 // Initialize
 async function init() {
@@ -32,8 +29,7 @@ async function loadSettings() {
       'defaultMode',
       'saveHistory',
       'promptHistory',
-      'apiProvider',
-      'popupTransparency'
+      'apiProvider'
     ]);
 
     if (!stored.setupComplete) {
@@ -43,18 +39,25 @@ async function loadSettings() {
       return;
     }
 
-    defaultMode = stored.defaultMode || 'Balanced';
+    selectedMode = stored.defaultMode || 'Balanced';
     saveHistory = stored.saveHistory || false;
     promptHistory = Array.isArray(stored.promptHistory) ? stored.promptHistory : [];
     
-    // Update status model display
-    if (stored.apiProvider) {
-      statusModel.textContent = stored.apiProvider;
+    // Show provider in header pill
+    if (stored.apiProvider && headerProvider) {
+      headerProvider.textContent = stored.apiProvider;
     }
 
-    if (typeof stored.popupTransparency === 'number') {
-      // stored value expected as 0.40-1.00
-      popupTransparency = Math.min(1, Math.max(0.4, stored.popupTransparency));
+    // Set initial active mode button
+    if (modeButtons.length) {
+      modeButtons.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.mode === selectedMode);
+      });
+    }
+
+    // Footer status
+    if (statusModel) {
+      statusModel.textContent = stored.apiProvider || 'Ready';
     }
   } catch (error) {
     console.error('Failed to load settings:', error);
@@ -63,6 +66,11 @@ async function loadSettings() {
 }
 
 function setupEventListeners() {
+  // Mode buttons (Basic / Balanced / Advanced)
+  modeButtons.forEach((button) => {
+    button.addEventListener('click', () => setActiveMode(button));
+  });
+
   // Style button selection
   styleButtons.forEach((button) => {
     button.addEventListener('click', () => setActiveStyle(button));
@@ -79,36 +87,18 @@ function setupEventListeners() {
     chrome.tabs.create({ url: chrome.runtime.getURL('setup/setup.html') });
   });
 
-  // Transparency slider
-  if (transparencySlider) {
-    transparencySlider.value = String(Math.round(popupTransparency * 100));
-    updatePopupTransparencyUI();
-
-    const persist = async () => {
-      try {
-        const v = Number(transparencySlider.value); // 40-100
-        popupTransparency = Math.min(1, Math.max(0.4, v / 100));
-        await chrome.storage.local.set({ popupTransparency });
-      } catch (e) {
-        console.error('Failed to persist popupTransparency:', e);
-      }
-    };
-
-    transparencySlider.addEventListener('input', () => {
-      updatePopupTransparencyUI();
-    });
-
-    transparencySlider.addEventListener('change', () => {
-      persist();
-    });
-  }
-
   // Keyboard shortcut - Ctrl/Cmd + Enter to refine
   inputPrompt.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
       handleRefine();
     }
   });
+}
+
+function setActiveMode(button) {
+  modeButtons.forEach((btn) => btn.classList.remove('active'));
+  button.classList.add('active');
+  selectedMode = button.dataset.mode;
 }
 
 function setActiveStyle(button) {
@@ -129,7 +119,7 @@ async function handleRefine() {
   setLoadingState(true);
 
   try {
-    const result = await sendRefineRequest(prompt, defaultMode, selectedStyle);
+    const result = await sendRefineRequest(prompt, selectedMode, selectedStyle);
     displayRefinedText(result.refined);
     
     if (saveHistory) {
@@ -197,24 +187,6 @@ function showCopyFeedback() {
   }, 2000);
 }
 
-function updatePopupTransparencyUI() {
-  const v = transparencySlider ? Number(transparencySlider.value) : Math.round(popupTransparency * 100);
-  popupTransparency = Math.min(1, Math.max(0.4, v / 100));
-
-  const popup = document.getElementById('prompfix-popup');
-  if (popup) {
-    popup.style.setProperty('--pf-popup-opacity', String(popupTransparency));
-    // keep blur constant; if you want blur coupling later, can map here
-    if (popup.style.getPropertyValue('--pf-popup-blur') === '') {
-      popup.style.setProperty('--pf-popup-blur', '24px');
-    }
-  }
-
-  if (transparencyValue) {
-    transparencyValue.textContent = `${Math.round(popupTransparency * 100)}%`;
-  }
-}
-
 function showNotice(message, type = 'error') {
   notice.textContent = message;
   notice.className = `pf-notice ${type}`;
@@ -242,8 +214,23 @@ function addHistoryItem(input, output) {
 }
 
 // Initialize when DOM is ready
+function startEntranceAnimation() {
+  const popup = document.getElementById('prompfix-popup');
+  if (popup) {
+    // Force reflow then let CSS animation run (reliable entrance)
+    popup.style.animation = 'none';
+    // trigger reflow
+    void popup.offsetWidth;
+    popup.style.animation = '';
+  }
+}
+
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
+  document.addEventListener('DOMContentLoaded', () => {
+    init();
+    startEntranceAnimation();
+  });
 } else {
   init();
+  startEntranceAnimation();
 }
