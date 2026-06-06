@@ -1,0 +1,356 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif}
+
+.backdrop{
+  min-height:720px;
+  background:#0d0d0d;
+  display:flex;align-items:center;justify-content:center;
+  padding:24px;
+  position:relative;
+  overflow:hidden;
+}
+
+.panel{
+  width:100%;max-width:460px;
+  background:#111;
+  border:1px solid #222;
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:0 0 0 1px #1a1a1a, 0 40px 100px rgba(0,0,0,.7);
+  position:relative;z-index:2;
+  font-size:13px;
+}
+
+/* header */
+.panel-header{
+  padding:16px 20px;
+  border-bottom:1px solid #1a1a1a;
+  display:flex;align-items:center;justify-content:space-between;
+  background:#111;
+}
+.header-left{display:flex;align-items:center;gap:10px}
+.header-icon{
+  width:28px;height:28px;border-radius:8px;
+  background:rgba(200,245,101,.08);
+  border:1px solid rgba(200,245,101,.25);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;color:#c8f565;
+}
+.panel-title{font-size:14px;font-weight:700;color:#fff;letter-spacing:-.3px}
+.panel-subtitle{font-size:10px;color:#444;margin-top:1px}
+.close-btn{
+  width:26px;height:26px;border-radius:6px;
+  background:#1a1a1a;border:1px solid #252525;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:#555;font-size:13px;transition:all .15s;
+  font-weight:600;
+}
+.close-btn:hover{background:#222;color:#888}
+
+/* body */
+.panel-body{padding:18px 20px;display:flex;flex-direction:column;gap:16px}
+
+/* field */
+.field-label{
+  font-size:10px;font-weight:700;color:#444;
+  letter-spacing:.8px;text-transform:uppercase;
+  margin-bottom:6px;display:flex;align-items:center;gap:6px;
+}
+.field-label .mode-badge{
+  background:rgba(200,245,101,.1);
+  border:1px solid rgba(200,245,101,.3);
+  color:#c8f565;font-size:9px;font-weight:700;
+  border-radius:999px;padding:1px 7px;letter-spacing:0;
+}
+
+/* original text area */
+.text-wrap{position:relative}
+.orig-textarea{
+  width:100%;min-height:92px;
+  background:#0d0d0d;
+  border:1px solid #222;
+  border-radius:12px;
+  padding:12px 14px;
+  color:#fff;font-size:13px;font-family:'DM Sans',sans-serif;
+  resize:vertical;outline:none;line-height:1.5;
+  transition:border-color .2s;
+}
+.orig-textarea:focus{border-color:rgba(200,245,101,.3)}
+.orig-textarea::placeholder{color:#444}
+.char-count{
+  position:absolute;bottom:8px;right:12px;
+  font-size:10px;color:#444;
+}
+
+/* mode pills */
+.mode-pills{display:flex;gap:6px;flex-wrap:wrap}
+.mpill{
+  font-size:11px;font-weight:600;padding:5px 11px;
+  border-radius:999px;border:1px solid #222;
+  color:#444;cursor:pointer;transition:all .15s;
+  background:#0d0d0d;
+}
+.mpill:hover{border-color:#333;color:#888}
+.mpill.active{
+  background:rgba(200,245,101,.1);
+  color:#c8f565;border-color:rgba(200,245,101,.3);
+}
+
+/* action buttons */
+.btn-row{display:flex;gap:8px}
+.btn-generate{
+  flex:1;padding:12px 16px;border-radius:12px;border:none;cursor:pointer;
+  font-size:13px;font-weight:700;font-family:'DM Sans',sans-serif;
+  background:#c8f565;color:#0a0a0a;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  transition:all .15s;
+}
+.btn-generate:hover{filter:brightness(1.05);transform:translateY(-1px)}
+.btn-generate:active{transform:translateY(0)}
+.btn-retry{
+  flex:1;padding:12px 16px;border-radius:12px;
+  border:1px solid #252525;cursor:pointer;
+  font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;
+  background:#1a1a1a;color:#666;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  transition:all .15s;
+}
+.btn-retry:hover{background:#222;color:#888;border-color:#333}
+
+/* output preview */
+.output-preview{
+  background:#0d0d0d;border:1px solid #1e1e1e;
+  border-radius:12px;padding:14px;
+  position:relative;
+}
+.output-label{
+  font-size:10px;font-weight:700;color:#c8f565;
+  letter-spacing:.8px;text-transform:uppercase;
+  margin-bottom:6px;display:flex;align-items:center;gap:6px;
+}
+.output-dot{width:6px;height:6px;border-radius:50%;background:#c8f565;animation:pulse 1.4s ease infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.output-text{font-size:13px;color:#ddd;line-height:1.55;white-space:pre-wrap;min-height:60px}
+.output-actions{display:flex;gap:6px;margin-top:12px}
+.oa-btn{
+  flex:1;padding:8px 12px;border-radius:8px;font-size:12px;font-weight:600;
+  font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .15s;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+}
+.oa-use{background:#c8f565;color:#0a0a0a;border:none}
+.oa-use:hover{filter:brightness(1.08)}
+.oa-copy{background:#1a1a1a;color:#666;border:1px solid #252525}
+.oa-copy:hover{background:#222;color:#888}
+
+/* additional instructions */
+.add-instr{
+  background:#0d0d0d;border:1px solid #1e1e1e;
+  border-radius:12px;padding:12px 14px;
+}
+.add-instr-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.add-instr-title{font-size:10px;font-weight:700;color:#444;display:flex;align-items:center;gap:6px}
+.opt-badge{font-size:9px;color:#333;background:#1a1a1a;border:1px solid #222;border-radius:4px;padding:1px 5px}
+.instr-input{
+  width:100%;background:#0d0d0d;border:1px solid #222;
+  border-radius:8px;padding:9px 11px;
+  color:#fff;font-size:12px;font-family:'DM Sans',sans-serif;
+  outline:none;transition:border-color .2s;
+}
+.instr-input:focus{border-color:rgba(200,245,101,.3)}
+.instr-input::placeholder{color:#444}
+.btn-rerefine{
+  width:100%;margin-top:8px;padding:9px 12px;border-radius:10px;
+  border:1px solid #252525;cursor:pointer;
+  font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;
+  background:#1a1a1a;color:#777;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  transition:all .15s;
+}
+.btn-rerefine:hover{background:#222;color:#aaa;border-color:#333}
+
+/* footer */
+.panel-footer{
+  padding:12px 20px;border-top:1px solid #1a1a1a;
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:10px;
+}
+.footer-hint{color:#2e2e2e;display:flex;align-items:center;gap:5px}
+.kbd{
+  display:inline-flex;align-items:center;
+  background:#1a1a1a;border:1px solid #252525;
+  border-radius:4px;padding:1px 5px;font-size:9px;color:#444;font-weight:600;
+}
+</style>
+
+<div class="backdrop">
+  <div class="panel">
+    <!-- Header -->
+    <div class="panel-header">
+      <div class="header-left">
+        <div class="header-icon"><i class="ti ti-sparkles"></i></div>
+        <div>
+          <div class="panel-title">Refine Prompt</div>
+          <div class="panel-subtitle">Powered by Prompfix · OpenAI GPT-4o</div>
+        </div>
+      </div>
+      <div class="close-btn" id="panel-close"><i class="ti ti-x"></i></div>
+    </div>
+
+    <!-- Body -->
+    <div class="panel-body">
+
+      <!-- Original Text -->
+      <div>
+        <div class="field-label">Original Text</div>
+        <div class="text-wrap">
+          <textarea id="orig-textarea" class="orig-textarea" placeholder="Your text will appear here..."></textarea>
+          <div class="char-count" id="char-count">0 chars</div>
+        </div>
+      </div>
+
+      <!-- Refinement Mode -->
+      <div>
+        <div class="field-label">
+          Refinement Mode
+          <span id="active-mode-badge" class="mode-badge">Advanced</span>
+        </div>
+        <div class="mode-pills">
+          <div class="mpill" data-mode="Basic">Basic</div>
+          <div class="mpill" data-mode="Balanced">Balanced</div>
+          <div class="mpill active" data-mode="Advanced">Advanced</div>
+          <div class="mpill" data-mode="Coding">Coding</div>
+          <div class="mpill" data-mode="Shorter">Shorter</div>
+          <div class="mpill" data-mode="Professional">Professional</div>
+        </div>
+      </div>
+
+      <!-- Generate / Retry -->
+      <div class="btn-row">
+        <button class="btn-generate" id="btn-generate">
+          <i class="ti ti-sparkles" style="font-size:15px"></i> Generate
+        </button>
+        <button class="btn-retry" id="btn-retry">
+          <i class="ti ti-refresh" style="font-size:15px"></i> Retry
+        </button>
+      </div>
+
+      <!-- Output Preview -->
+      <div class="output-preview" id="output-preview" style="display:none">
+        <div class="output-label"><span class="output-dot"></span> Refined output</div>
+        <div class="output-text" id="output-text"></div>
+        <div class="output-actions">
+          <button class="oa-btn oa-use" id="btn-use">Use this</button>
+          <button class="oa-btn oa-copy" id="btn-copy"><i class="ti ti-copy" style="font-size:13px"></i> Copy</button>
+        </div>
+      </div>
+
+      <!-- Additional Instructions (collapsible) -->
+      <div class="add-instr">
+        <div class="add-instr-header">
+          <div class="add-instr-title">
+            <i class="ti ti-message-dots" style="font-size:14px;color:#333"></i>
+            Additional instructions
+            <span class="opt-badge">optional</span>
+          </div>
+        </div>
+        <input id="instr-input" class="instr-input" type="text" placeholder="e.g., Make it shorter, more formal, add examples…" />
+        <button class="btn-rerefine" id="btn-rerefine">
+          <i class="ti ti-arrows-exchange" style="font-size:15px"></i>
+          Re-refine with comment
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="panel-footer">
+      <div class="footer-hint">
+        <i class="ti ti-lock-filled"></i>
+        API key stays on your device
+      </div>
+      <div class="footer-hint">Press <span class="kbd">Esc</span> to close</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Demo mode switching
+document.querySelectorAll('.mpill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('.mpill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    document.getElementById('active-mode-badge').textContent = pill.dataset.mode;
+  });
+});
+
+// Live character count
+const textarea = document.getElementById('orig-textarea');
+const charCount = document.getElementById('char-count');
+textarea.addEventListener('input', () => {
+  charCount.textContent = textarea.value.length + ' chars';
+});
+
+// Demo generate with character streaming
+function showOutputDemo() {
+  const box = document.getElementById('output-preview');
+  const textEl = document.getElementById('output-text');
+  box.style.display = 'block';
+  textEl.textContent = '';
+
+  const mode = document.querySelector('.mpill.active').dataset.mode;
+  const demoOutputs = {
+    Basic: "Write a job application email for a position at Google.",
+    Balanced: "Write a professional job application email for a role at Google, highlighting your relevant experience and enthusiasm for the company.",
+    Advanced: "Write a compelling job application email for a software engineering position at Google. Include a strong opening referencing a specific product, concrete achievements with metrics, relevant technical skills, and enthusiasm for the company's mission.",
+    Coding: "Draft a job application email for a developer role at Google. Mention your GitHub portfolio, open-source contributions, and technical stack (Python, Go, distributed systems).",
+    Shorter: "Write a concise job application email for Google — 3 sentences covering who I am, why Google, and next steps.",
+    Professional: "Compose a formal job application letter for a position at Google, with proper structure, subject line, salutation, and courteous closing."
+  };
+
+  const content = demoOutputs[mode] || demoOutputs.Advanced;
+  let i = 0;
+  const interval = setInterval(() => {
+    textEl.textContent += content[i];
+    i++;
+    if (i >= content.length) clearInterval(interval);
+  }, 14);
+}
+
+document.getElementById('btn-generate').addEventListener('click', showOutputDemo);
+document.getElementById('btn-retry').addEventListener('click', showOutputDemo);
+
+// Close button
+document.getElementById('panel-close').addEventListener('click', () => {
+  document.querySelector('.panel').style.display = 'none';
+});
+
+// Demo buttons
+document.getElementById('btn-use').addEventListener('click', () => {
+  alert('This would replace the original text on the page.');
+});
+document.getElementById('btn-copy').addEventListener('click', () => {
+  const t = document.getElementById('output-text').textContent;
+  navigator.clipboard.writeText(t);
+  const orig = event.currentTarget.innerHTML;
+  event.currentTarget.innerHTML = 'Copied!';
+  setTimeout(() => {
+    event.currentTarget.innerHTML = orig;
+  }, 1200);
+});
+
+document.getElementById('btn-rerefine').addEventListener('click', () => {
+  const comment = document.getElementById('instr-input').value;
+  if (!comment) return alert('Please enter a comment.');
+  alert('Re-refining with comment: ' + comment + ' (demo)');
+});
+
+// Keyboard support
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    document.querySelector('.panel').style.display = 'none';
+  }
+});
+</script>

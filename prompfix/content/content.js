@@ -137,6 +137,14 @@ function makeDraggable(logo) {
 let logoPosition = null;
 let hasUserDragged = false;
 
+// Remember last panel position across uses (persisted)
+let lastPanelPosition = null;
+chrome.storage.local.get(['lastRefinePanelPosition'], (res) => {
+  if (res.lastRefinePanelPosition) {
+    lastPanelPosition = res.lastRefinePanelPosition;
+  }
+});
+
 function showLogo(target) {
   const logo = createLogo();
 
@@ -202,92 +210,289 @@ function createPanel() {
   panel.id = PANEL_ID;
   panel.className = 'prompfix-panel';
   panel.innerHTML = `
-    <header>
-      <div class="panel-logo" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/>
-          <path d="M12 5.2 L13.6 10.4 L19 12 L13.6 13.6 L12 18.8 L10.4 13.6 L5 12 L10.4 10.4 Z" fill="#fff"/>
-          <circle cx="17.2" cy="6.8" r="1.35" fill="#fff" fill-opacity="0.9"/>
-        </svg>
+    <div class="panel-header" id="panel-drag-handle">
+      <div class="header-left">
+        <div class="header-icon"><i class="ti ti-sparkles"></i></div>
+        <div>
+          <div class="panel-title">Refine Prompt</div>
+          <div class="panel-subtitle">Powered by Prompfix · ${settings.apiProvider || 'OpenAI'}</div>
+        </div>
       </div>
-      <div class="panel-title">
-        <h3>Refine Prompt</h3>
-        <span class="panel-provider" id="panel-provider">${settings.apiProvider}</span>
+      <div class="close-btn" id="panel-close"><i class="ti ti-x"></i></div>
+    </div>
+
+    <!-- Opacity adjustment bar -->
+    <div class="opacity-bar" id="panel-opacity-bar" title="Drag to adjust panel opacity">
+      <div class="opacity-handle" id="panel-opacity-handle"></div>
+    </div>
+
+    <div class="panel-body">
+
+      <!-- Original Text -->
+      <div>
+        <div class="field-label">Original Text</div>
+        <div class="text-wrap">
+          <textarea id="orig-textarea" class="orig-textarea" placeholder="Your text will appear here..."></textarea>
+          <div class="char-count" id="char-count">0 chars</div>
+        </div>
       </div>
-      <button type="button" id="prompfix-close" title="Close">×</button>
-    </header>
-    
-    <div>
-      <label>Original Text</label>
-      <textarea id="prompfix-source" placeholder="Enter your prompt here..." spellcheck="false"></textarea>
+
+      <!-- Refinement Mode -->
+      <div>
+        <div class="field-label">
+          Refinement Mode
+          <span id="active-mode-badge" class="mode-badge">Advanced</span>
+        </div>
+        <div class="mode-pills">
+          <div class="mpill" data-mode="Basic">Basic</div>
+          <div class="mpill" data-mode="Balanced">Balanced</div>
+          <div class="mpill active" data-mode="Advanced">Advanced</div>
+          <div class="mpill" data-mode="Coding">Coding</div>
+          <div class="mpill" data-mode="Shorter">Shorter</div>
+          <div class="mpill" data-mode="Professional">Professional</div>
+        </div>
+      </div>
+
+      <!-- Generate / Retry -->
+      <div class="btn-row">
+        <button class="btn-generate" id="btn-generate">
+          <i class="ti ti-sparkles" style="font-size:15px"></i> Generate
+        </button>
+        <button class="btn-retry" id="btn-retry">
+          <i class="ti ti-refresh" style="font-size:15px"></i> Retry
+        </button>
+      </div>
+
+      <!-- Output Preview -->
+      <div class="output-preview" id="output-preview" style="display:none">
+        <div class="output-label"><span class="output-dot"></span> Refined output</div>
+        <div class="output-text" id="output-text"></div>
+        <div class="output-actions">
+          <button class="oa-btn oa-use" id="btn-use">Use this</button>
+          <button class="oa-btn oa-copy" id="btn-copy"><i class="ti ti-copy" style="font-size:13px"></i> Copy</button>
+        </div>
+      </div>
+
+      <!-- Additional Instructions (collapsible) -->
+      <div class="add-instr">
+        <div class="add-instr-header">
+          <div class="add-instr-title">
+            <i class="ti ti-message-dots" style="font-size:14px;color:#333"></i>
+            Additional instructions
+            <span class="opt-badge">optional</span>
+          </div>
+        </div>
+        <input id="instr-input" class="instr-input" type="text" placeholder="e.g., Make it shorter, more formal, add examples…" />
+        <button class="btn-rerefine" id="btn-rerefine">
+          <i class="ti ti-arrows-exchange" style="font-size:15px"></i>
+          Re-refine with comment
+        </button>
+      </div>
+
     </div>
-    
-    <div class="mode-row">
-      <label>Mode</label>
-      <select id="prompfix-mode"></select>
+
+    <!-- Footer -->
+    <div class="panel-footer">
+      <div class="footer-hint">
+        <i class="ti ti-lock-filled"></i>
+        API key stays on your device
+      </div>
+      <div class="footer-hint">Press <span class="kbd">Esc</span> to close</div>
     </div>
-    
-    <div class="button-row">
-      <button type="button" class="primary-button" id="prompfix-generate">Generate</button>
-      <button type="button" class="secondary-button" id="prompfix-retry">Retry</button>
-    </div>
-    
-    <div class="status-text">Mode: <strong id="current-mode-display">Balanced</strong></div>
-    
-    <div class="comment-section">
-      <label>Additional instructions (optional)</label>
-      <input id="prompfix-comment" placeholder="e.g. make it shorter, more formal, add examples..." />
-      <button type="button" class="secondary-button" id="prompfix-rerefine">Re-refine with this</button>
-    </div>
-    
-    <div class="output-box hidden" id="prompfix-output"></div>
-    <div class="status-text small-text">Press Esc or click outside to close</div>
   `;
 
   document.body.appendChild(panel);
   panelElement = panel;
-  
-  // Setup event listeners
-  panel.querySelector('#prompfix-close').addEventListener('click', removePanel);
-  panel.querySelector('#prompfix-generate').addEventListener('click', () => generateRefinement(false));
-  panel.querySelector('#prompfix-retry').addEventListener('click', () => generateRefinement(false, true));
-  panel.querySelector('#prompfix-rerefine').addEventListener('click', () => generateRefinement(true));
-  
-  // Set source text
-  const sourceTextarea = panel.querySelector('#prompfix-source');
-  sourceTextarea.value = currentText;
-  
-  // Setup mode selector
-  const modeSelect = panel.querySelector('#prompfix-mode');
-  MODE_NAMES.forEach((mode) => {
-    const option = document.createElement('option');
-    option.value = mode;
-    option.textContent = mode;
-    modeSelect.appendChild(option);
+
+  // Set original text and live char count (matching prototype)
+  const source = panel.querySelector('#orig-textarea');
+  source.value = currentText;
+  const charCount = panel.querySelector('#char-count');
+  const updateCount = () => { charCount.textContent = source.value.length + ' chars'; };
+  source.addEventListener('input', updateCount);
+  updateCount();
+
+  // Mode pills (exact from prototype)
+  const pills = panel.querySelectorAll('.mpill');
+  const modeBadge = panel.querySelector('#active-mode-badge');
+  const defaultMode = settings.defaultMode || 'Advanced';
+  pills.forEach(pill => {
+    if (pill.dataset.mode === defaultMode) {
+      pill.classList.add('active');
+      modeBadge.textContent = pill.dataset.mode;
+    }
+    pill.addEventListener('click', () => {
+      pills.forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      modeBadge.textContent = pill.dataset.mode;
+    });
   });
-  modeSelect.value = settings.defaultMode || 'Balanced';
-  
-  // Update mode display
-  updateModeDisplay();
-  modeSelect.addEventListener('change', updateModeDisplay);
-  
-  // Position panel
+
+  // Wire buttons to real logic (using prototype IDs)
+  panel.querySelector('#panel-close').addEventListener('click', removePanel);
+  panel.querySelector('#btn-generate').addEventListener('click', () => generateRefinement(false));
+  panel.querySelector('#btn-retry').addEventListener('click', () => generateRefinement(false, true));
+  panel.querySelector('#btn-rerefine').addEventListener('click', () => generateRefinement(true));
+
+  // "Use this" - replaces the original field on the page + save history
+  const useBtn = panel.querySelector('#btn-use');
+  if (useBtn) {
+    useBtn.addEventListener('click', () => {
+      const refined = panel.querySelector('#output-text').textContent.trim();
+      if (refined && activeTarget) {
+        setTargetText(activeTarget, refined);
+        if (settings.saveHistory) {
+          saveHistoryEntry(source.value, refined);
+        }
+        removePanel();
+      }
+    });
+  }
+
+  // Copy button
+  const copyBtn = panel.querySelector('#btn-copy');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', () => {
+      const t = panel.querySelector('#output-text').textContent;
+      navigator.clipboard.writeText(t).then(() => {
+        const orig = copyBtn.innerHTML;
+        copyBtn.innerHTML = 'Copied!';
+        setTimeout(() => { copyBtn.innerHTML = orig; }, 1200);
+      }).catch(() => {});
+    });
+  }
+
+  // Position the panel near the active field + outside click
   positionPanel(panel);
-  
-  // Add click outside listener
   setTimeout(() => {
     window.addEventListener('mousedown', handleOutsideClick, true);
   }, 100);
-  
+
+  // Esc key close (added here for the new panel)
+  const escHandler = (e) => {
+    if (e.key === 'Escape' && panelElement) {
+      removePanel();
+      window.removeEventListener('keydown', escHandler, true);
+    }
+  };
+  window.addEventListener('keydown', escHandler, true);
+
+  // === Make panel moveable (drag by header) ===
+  makePanelDraggable(panel, panel.querySelector('#panel-drag-handle'));
+
+  // === Opacity control bar ===
+  initPanelOpacityControl(panel, panel.querySelector('#panel-opacity-bar'), panel.querySelector('#panel-opacity-handle'));
+
   return panel;
 }
 
-function updateModeDisplay() {
-  const modeSelect = panelElement?.querySelector('#prompfix-mode');
-  const modeDisplay = panelElement?.querySelector('#current-mode-display');
-  if (modeSelect && modeDisplay) {
-    modeDisplay.textContent = modeSelect.value;
-  }
+/* Draggable panel logic (similar to logo but for full panel) */
+function makePanelDraggable(panel, handle) {
+  if (!handle) return;
+
+  let isDragging = false;
+  let startX = 0;
+  let startY = 0;
+  let startLeft = 0;
+  let startTop = 0;
+
+  const clamp = (val, min, max) => Math.max(min, Math.min(max, val));
+
+  handle.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0) return;
+    isDragging = true;
+    panel.classList.add('dragging');
+
+    const rect = panel.getBoundingClientRect();
+    startLeft = rect.left;
+    startTop = rect.top;
+    startX = e.clientX;
+    startY = e.clientY;
+
+    handle.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  });
+
+  handle.addEventListener('pointermove', (e) => {
+    if (!isDragging) return;
+
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+
+    let newLeft = startLeft + dx;
+    let newTop = startTop + dy;
+
+    // Keep panel on screen
+    const pad = 8;
+    const w = panel.offsetWidth;
+    const h = panel.offsetHeight;
+
+    newLeft = clamp(newLeft, pad, window.innerWidth - w - pad);
+    newTop = clamp(newTop, pad, window.innerHeight - h - pad);
+
+    panel.style.left = `${newLeft}px`;
+    panel.style.top = `${newTop}px`;
+    panel.style.right = 'auto'; // clear any previous right positioning
+  });
+
+  const endDrag = (e) => {
+    if (!isDragging) return;
+    isDragging = false;
+    panel.classList.remove('dragging');
+
+    if (handle.hasPointerCapture(e.pointerId)) {
+      handle.releasePointerCapture(e.pointerId);
+    }
+  };
+
+  handle.addEventListener('pointerup', endDrag);
+  handle.addEventListener('pointercancel', endDrag);
+}
+
+/* Opacity control bar (drag left/right to change transparency) */
+let panelOpacity = 1;
+
+function initPanelOpacityControl(panel, bar, handle) {
+  if (!bar || !handle) return;
+
+  const minOpacity = 0.35;
+  const maxOpacity = 1;
+
+  const updateOpacity = (clientX) => {
+    const rect = bar.getBoundingClientRect();
+    let percent = (clientX - rect.left) / rect.width;
+    percent = Math.max(0, Math.min(1, percent));
+
+    panelOpacity = minOpacity + (maxOpacity - minOpacity) * percent;
+    panel.style.opacity = panelOpacity;
+    handle.style.left = `${percent * 100}%`;
+  };
+
+  // Set initial position
+  handle.style.left = `${(panelOpacity - minOpacity) / (maxOpacity - minOpacity) * 100}%`;
+
+  let dragging = false;
+
+  bar.addEventListener('pointerdown', (e) => {
+    dragging = true;
+    updateOpacity(e.clientX);
+    bar.setPointerCapture(e.pointerId);
+  });
+
+  bar.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+    updateOpacity(e.clientX);
+  });
+
+  const stop = (e) => {
+    if (dragging) {
+      dragging = false;
+      if (bar.hasPointerCapture(e.pointerId)) bar.releasePointerCapture(e.pointerId);
+    }
+  };
+
+  bar.addEventListener('pointerup', stop);
+  bar.addEventListener('pointercancel', stop);
 }
 
 function positionPanel(panel) {
@@ -317,14 +522,15 @@ function removePanel() {
     panelElement.style.opacity = '0';
     panelElement.style.transform = 'scale(0.98)';
 
-    window.removeEventListener('keydown', handleEscToClose, true);
+    // Remove global listeners (they were added with {capture: true} in some cases)
+    window.removeEventListener('mousedown', handleOutsideClick, true);
 
     setTimeout(() => {
       if (panelElement) {
         panelElement.remove();
         panelElement = null;
 
-        // Re-show the draggable logo after closing (if we still have context)
+        // Re-show the draggable logo after closing
         if (activeTarget && logoElement) {
           logoElement.style.display = 'flex';
           logoElement.style.opacity = '1';
@@ -332,21 +538,12 @@ function removePanel() {
         }
       }
     }, 200);
-
-    window.removeEventListener('mousedown', handleOutsideClick, true);
   }
 }
 
 function handleOutsideClick(event) {
   if (!panelElement) return;
   if (!panelElement.contains(event.target) && (!logoElement || event.target !== logoElement)) {
-    removePanel();
-  }
-}
-
-function handleEscToClose(event) {
-  if (!panelElement) return;
-  if (event.key === 'Escape') {
     removePanel();
   }
 }
@@ -364,13 +561,8 @@ function openPanel() {
 
   const panel = createPanel();
 
-  const outputBox = panel.querySelector('#prompfix-output');
-  if (outputBox) {
-    outputBox.classList.add('hidden');
-    outputBox.textContent = '';
-  }
-
-  // Focus on source textarea
+  // The new panel already sets up the output box as display:none and handles Esc internally in createPanel.
+  // Focus the original textarea
   setTimeout(() => {
     const sourceTextarea = panel.querySelector('#prompfix-source');
     if (sourceTextarea) {
@@ -378,9 +570,6 @@ function openPanel() {
       sourceTextarea.select();
     }
   }, 100);
-
-  // Esc closes panel (professional UX)
-  window.addEventListener('keydown', handleEscToClose, true);
 }
 
 function getTargetText(target) {
@@ -406,25 +595,25 @@ async function generateRefinement(commentMode = false, retry = false) {
   if (!panelElement) return;
 
   const source = panelElement.querySelector('#prompfix-source');
-  const mode = panelElement.querySelector('#prompfix-mode').value;
+  const activePill = panelElement.querySelector('.mpill.active');
+  const mode = activePill ? activePill.dataset.mode : (settings.defaultMode || 'Advanced');
   const comment = panelElement.querySelector('#prompfix-comment').value.trim();
   const outputBox = panelElement.querySelector('#prompfix-output');
+  const outputTextEl = panelElement.querySelector('#prompfix-output-text');
   const generateButton = panelElement.querySelector('#prompfix-generate');
   const retryButton = panelElement.querySelector('#prompfix-retry');
   const reRefineButton = panelElement.querySelector('#prompfix-rerefine');
 
   const prompt = source.value.trim();
   if (!prompt) {
-    outputBox.textContent = 'Please enter text to refine.';
-    outputBox.classList.remove('hidden');
+    outputBox.style.display = 'block';
+    outputTextEl.textContent = 'Please enter text to refine.';
     return;
   }
 
-  // Set loading state
   setLoadingState(true, generateButton, retryButton, reRefineButton);
 
   try {
-    // Use chosen mode + a solid default style for in-page refinements
     const refined = await fetchRefinement(
       prompt,
       mode,
@@ -432,23 +621,25 @@ async function generateRefinement(commentMode = false, retry = false) {
       commentMode ? comment : ''
     );
 
-    outputBox.textContent = refined;
-    outputBox.classList.remove('hidden');
+    // Show output box and stream the text character by character
+    outputBox.style.display = 'block';
+    outputTextEl.textContent = '';
 
-    // Update target text
-    setTargetText(activeTarget, refined);
-
-    // Save to history
-    if (settings.saveHistory) {
-      saveHistoryEntry(prompt, refined);
-    }
-
-    // Scroll to output
-    outputBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    let i = 0;
+    const stream = setInterval(() => {
+      outputTextEl.textContent += refined[i] || '';
+      i++;
+      if (i >= refined.length) {
+        clearInterval(stream);
+        if (settings.saveHistory) {
+          saveHistoryEntry(prompt, refined);
+        }
+      }
+    }, 12);
 
   } catch (error) {
-    outputBox.innerHTML = `<span style="color: #fca5a5;">Error: ${escapeHtml(error.message)}</span>`;
-    outputBox.classList.remove('hidden');
+    outputBox.style.display = 'block';
+    outputTextEl.innerHTML = `<span style="color:#fca5a5;">Error: ${escapeHtml(error.message)}</span>`;
   } finally {
     setLoadingState(false, generateButton, retryButton, reRefineButton);
   }
@@ -460,15 +651,15 @@ function setLoadingState(loading, generateButton, retryButton, reRefineButton) {
   if (loading) {
     buttons.forEach(btn => {
       btn.disabled = true;
-      if (btn === generateButton) {
-        btn.innerHTML = '<span class="loading-spinner"></span> Working...';
+      if (btn.classList.contains('btn-generate')) {
+        btn.innerHTML = '<i class="ti ti-refresh" style="font-size:15px"></i> Working...';
       }
     });
   } else {
     buttons.forEach(btn => {
       btn.disabled = false;
-      if (btn === generateButton) {
-        btn.innerHTML = '<span>Generate</span>';
+      if (btn.classList.contains('btn-generate')) {
+        btn.innerHTML = '<i class="ti ti-sparkles" style="font-size:15px"></i> Generate';
       }
     });
   }
