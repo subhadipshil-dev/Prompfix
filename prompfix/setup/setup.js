@@ -116,15 +116,16 @@ function loadSavedSettings() {
 }
 
 function updateUI() {
-  // Update progress bar
+  // Update progress bar (kept for compatibility, hidden in new design)
   const progress = (currentStep / totalSteps) * 100;
   if (progressFill) {
     progressFill.style.width = progress + '%';
   }
 
-  // Update step indicators
-  document.querySelectorAll('.progress-step').forEach((step, index) => {
-    const stepNum = index + 1;
+  // Update old progress steps (if any) + new sidebar stepper
+  document.querySelectorAll('.progress-step, .sidebar-step').forEach((step) => {
+    const stepNum = parseInt(step.dataset.step);
+    if (!stepNum) return;
     step.classList.remove('active', 'completed');
     if (stepNum < currentStep) {
       step.classList.add('completed');

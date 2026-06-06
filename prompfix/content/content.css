@@ -54,14 +54,19 @@
   transform: scale(0.94);
 }
 
-/* Cool subtle idle glow (very light, performant) */
+/* Cool subtle idle glow + slow elegant breathing */
 .prompfix-logo {
-  animation: logoIdleGlow 3.2s ease-in-out infinite;
+  animation: logoIdleGlow 3.8s ease-in-out infinite, logoFloat 7.2s ease-in-out infinite;
 }
 
 @keyframes logoIdleGlow {
   0%, 100% { box-shadow: 0 8px 24px rgba(124, 58, 237, 0.32), 0 0 0 1px rgba(255, 255, 255, 0.12) inset; }
-  50% { box-shadow: 0 8px 28px rgba(124, 58, 237, 0.38), 0 0 0 1px rgba(255, 255, 255, 0.16) inset; }
+  50% { box-shadow: 0 12px 32px rgba(124, 58, 237, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.18) inset; }
+}
+
+@keyframes logoFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1.5px); }
 }
 
 /* === Refinement Panel === */
@@ -86,6 +91,27 @@
   animation: panelSlideIn 0.32s cubic-bezier(0.25, 0.1, 0.25, 1);
   overflow: hidden;
   will-change: transform, opacity;
+  position: relative;
+}
+
+/* Subtle looping ambient glow inside the panel */
+.prompfix-panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 65% 25%,
+    rgba(124, 58, 237, 0.05) 0%,
+    transparent 55%
+  );
+  pointer-events: none;
+  animation: panelAmbient 14s ease-in-out infinite;
+  border-radius: 16px;
+}
+
+@keyframes panelAmbient {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
 }
 
 @keyframes panelSlideIn {

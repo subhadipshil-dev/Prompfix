@@ -9,225 +9,236 @@
   <link rel="stylesheet" href="setup.css">
 </head>
 <body>
-  <!-- Background Effects -->
-  <div class="bg-orb bg-orb-1"></div>
-  <div class="bg-orb bg-orb-2"></div>
-
-  <div class="setup-container">
-    <!-- Header -->
-    <header class="setup-header">
-      <div class="setup-logo">
-        <span class="material-symbols-outlined">auto_awesome</span>
-      </div>
-      <h1 class="setup-title">Welcome to Prompfix</h1>
-      <p class="setup-subtitle">Let's get your AI prompt assistant configured</p>
-    </header>
-
-    <!-- Progress Bar -->
-    <div class="progress-container">
-      <div class="progress-bar">
-        <div class="progress-fill" id="progress-fill" style="width: 20%"></div>
-      </div>
-      <div class="progress-steps">
-        <div class="progress-step active" data-step="1">Profile</div>
-        <div class="progress-step" data-step="2">API Key</div>
-        <div class="progress-step" data-step="3">Model</div>
-        <div class="progress-step" data-step="4">Style</div>
-        <div class="progress-step" data-step="5">Complete</div>
-      </div>
-    </div>
-
-    <!-- Step 1: Profile -->
-    <div class="step-container active" id="step-1">
-      <div class="setup-card">
-        <div class="card-header">
-          <div class="card-icon">
-            <span class="material-symbols-outlined">person</span>
-          </div>
-          <h2 class="card-title">Your Profile</h2>
+  <div class="setup-layout">
+    <!-- Modern Sidebar Stepper (like Cursor / Linear / Vercel) -->
+    <aside class="setup-sidebar">
+      <div class="sidebar-header">
+        <div class="setup-logo">
+          <span class="material-symbols-outlined">auto_awesome</span>
         </div>
-        
-        <div class="form-group">
-          <label class="form-label">Display Name</label>
-          <input type="text" class="form-input" id="display-name" placeholder="Enter your name">
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">Role / Social Link</label>
-          <input type="text" class="form-input" id="social-link" placeholder="https://...">
+        <div>
+          <div class="sidebar-brand">Prompfix</div>
+          <div class="sidebar-tagline">Prompt Refiner</div>
         </div>
       </div>
-    </div>
 
-    <!-- Step 2: API Key -->
-    <div class="step-container" id="step-2">
-      <div class="setup-card">
-        <div class="card-header">
-          <div class="card-icon">
-            <span class="material-symbols-outlined">key</span>
+      <div class="sidebar-steps">
+        <div class="sidebar-step active" data-step="1">
+          <div class="step-number">1</div>
+          <div class="step-info">
+            <div class="step-title">Profile</div>
+            <div class="step-desc">Your name &amp; details</div>
           </div>
-          <h2 class="card-title">API Connection</h2>
         </div>
-
-        <div class="security-badge">
-          <span class="material-symbols-outlined" style="font-size: 16px;">lock</span>
-          <span>Your keys are stored locally and never leave your browser</span>
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">API Provider</label>
-          <select class="form-select" id="api-provider">
-            <option value="OpenAI">OpenAI</option>
-            <option value="Claude">Anthropic (Claude)</option>
-            <option value="Gemini">Google Gemini</option>
-            <option value="OpenRouter">OpenRouter</option>
-          </select>
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">API Key</label>
-          <div class="api-key-container">
-            <input type="password" class="form-input" id="api-key" placeholder="sk-...">
-            <button type="button" class="toggle-visibility-btn" id="toggle-key">Show</button>
+        <div class="sidebar-step" data-step="2">
+          <div class="step-number">2</div>
+          <div class="step-info">
+            <div class="step-title">API Connection</div>
+            <div class="step-desc">Connect your AI provider</div>
           </div>
-          <p class="form-hint">
-            <span class="material-symbols-outlined" style="font-size: 14px;">info</span>
-            Your API key is encrypted and stored locally
-          </p>
         </div>
-        
-        <div class="form-group" id="gemini-model-container" style="display: none;">
-          <label class="form-label">Gemini Model</label>
-          <select class="form-select" id="gemini-model">
-            <option value="gemini-3.5-flash">gemini-3.5-flash</option>
-            <option value="gemini-2.0-flash">gemini-2.0-flash</option>
-            <option value="gemini-1.5-flash">gemini-1.5-flash</option>
-            <option value="gemini-1.5-pro">gemini-1.5-pro</option>
-          </select>
+        <div class="sidebar-step" data-step="3">
+          <div class="step-number">3</div>
+          <div class="step-info">
+            <div class="step-title">Default Model</div>
+            <div class="step-desc">Choose your go-to model</div>
+          </div>
         </div>
-      </div>
-    </div>
-
-    <!-- Step 3: Model Selection -->
-    <div class="step-container" id="step-3">
-      <div class="setup-card">
-        <div class="card-header">
-          <div class="card-icon">
-            <span class="material-symbols-outlined">memory</span>
+        <div class="sidebar-step" data-step="4">
+          <div class="step-number">4</div>
+          <div class="step-info">
+            <div class="step-title">Preferences</div>
+            <div class="step-desc">Style &amp; history</div>
           </div>
-          <h2 class="card-title">Default Model</h2>
         </div>
-        
-        <div class="model-grid">
-          <div class="model-card active" data-model="GPT-4o">
-            <span class="material-symbols-outlined model-icon">psychology</span>
-            <h3 class="model-name">GPT-4o</h3>
-            <p class="model-description">Best all-rounder for most tasks</p>
-          </div>
-          
-          <div class="model-card" data-model="Claude 3.5">
-            <span class="material-symbols-outlined model-icon">smart_toy</span>
-            <h3 class="model-name">Claude 3.5 Sonnet</h3>
-            <p class="model-description">Excellent for coding and analysis</p>
-          </div>
-          
-          <div class="model-card" data-model="Gemini 1.5">
-            <span class="material-symbols-outlined model-icon">token</span>
-            <h3 class="model-name">Gemini 1.5 Pro</h3>
-            <p class="model-description">Large context window</p>
+        <div class="sidebar-step" data-step="5">
+          <div class="step-number">5</div>
+          <div class="step-info">
+            <div class="step-title">All Set</div>
+            <div class="step-desc">You're ready to go</div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Step 4: Refinement Style -->
-    <div class="step-container" id="step-4">
-      <div class="setup-card">
-        <div class="card-header">
-          <div class="card-icon">
-            <span class="material-symbols-outlined">tune</span>
-          </div>
-          <h2 class="card-title">Default Refinement Style</h2>
+      <div class="sidebar-footer">
+        <div class="security-note">
+          <span class="material-symbols-outlined">lock</span>
+          <span>Keys stored locally only</span>
         </div>
-        
-        <div class="style-list">
-          <div class="style-item active" data-style="Concise">
-            <div class="style-item-info">
-              <h3 class="style-item-name">Concise &amp; Direct</h3>
-              <p class="style-item-description">Strips fluff, keeps only essential instructions</p>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="setup-main">
+      <div class="setup-content">
+        <!-- Step 1: Profile -->
+        <div class="step-container active" id="step-1">
+          <div class="step-header">
+            <h1 class="step-title-main">Create your profile</h1>
+            <p class="step-subtitle">This helps personalize your experience.</p>
+          </div>
+
+          <div class="setup-card">
+            <div class="form-group">
+              <label class="form-label">Display Name</label>
+              <input type="text" class="form-input" id="display-name" placeholder="Alex Rivera">
             </div>
-            <div class="style-check">
-              <span class="material-symbols-outlined">check</span>
-            </div>
-          </div>
-          
-          <div class="style-item" data-style="Balanced">
-            <div class="style-item-info">
-              <h3 class="style-item-name">Balanced</h3>
-              <p class="style-item-description">Improves clarity while maintaining original tone</p>
-            </div>
-            <div class="style-check">
-              <span class="material-symbols-outlined">check</span>
-            </div>
-          </div>
-          
-          <div class="style-item" data-style="Professional">
-            <div class="style-item-info">
-              <h3 class="style-item-name">Highly Professional</h3>
-              <p class="style-item-description">Formal tone, structured format, extremely detailed</p>
-            </div>
-            <div class="style-check">
-              <span class="material-symbols-outlined">check</span>
+            
+            <div class="form-group">
+              <label class="form-label">Role or Social</label>
+              <input type="text" class="form-input" id="social-link" placeholder="https://x.com/yourhandle">
             </div>
           </div>
         </div>
+
+        <!-- Step 2: API Key -->
+        <div class="step-container" id="step-2">
+          <div class="step-header">
+            <h1 class="step-title-main">Connect your AI</h1>
+            <p class="step-subtitle">Your API key is stored securely on your device.</p>
+          </div>
+
+          <div class="setup-card">
+            <div class="form-group">
+              <label class="form-label">Provider</label>
+              <select class="form-select" id="api-provider">
+                <option value="OpenAI">OpenAI</option>
+                <option value="Claude">Anthropic (Claude)</option>
+                <option value="Gemini">Google Gemini</option>
+                <option value="OpenRouter">OpenRouter</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">API Key</label>
+              <div class="api-key-container">
+                <input type="password" class="form-input" id="api-key" placeholder="sk-...">
+                <button type="button" class="toggle-visibility-btn" id="toggle-key">Show</button>
+              </div>
+              <p class="form-hint">Never shared. Stored in chrome.storage.local.</p>
+            </div>
+            
+            <div class="form-group" id="gemini-model-container" style="display: none;">
+              <label class="form-label">Gemini Model</label>
+              <select class="form-select" id="gemini-model">
+                <option value="gemini-3.5-flash">gemini-3.5-flash</option>
+                <option value="gemini-2.0-flash">gemini-2.0-flash</option>
+                <option value="gemini-1.5-flash">gemini-1.5-flash</option>
+                <option value="gemini-1.5-pro">gemini-1.5-pro</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3: Model Selection -->
+        <div class="step-container" id="step-3">
+          <div class="step-header">
+            <h1 class="step-title-main">Choose your default model</h1>
+            <p class="step-subtitle">You can change this later in settings.</p>
+          </div>
+
+          <div class="model-grid">
+            <div class="model-card active" data-model="GPT-4o">
+              <span class="material-symbols-outlined model-icon">psychology</span>
+              <h3 class="model-name">GPT-4o</h3>
+              <p class="model-description">Best all-rounder for most tasks</p>
+            </div>
+            
+            <div class="model-card" data-model="Claude 3.5">
+              <span class="material-symbols-outlined model-icon">smart_toy</span>
+              <h3 class="model-name">Claude 3.5 Sonnet</h3>
+              <p class="model-description">Excellent for coding and analysis</p>
+            </div>
+            
+            <div class="model-card" data-model="Gemini 1.5">
+              <span class="material-symbols-outlined model-icon">token</span>
+              <h3 class="model-name">Gemini 1.5 Pro</h3>
+              <p class="model-description">Large context window</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4: Preferences -->
+        <div class="step-container" id="step-4">
+          <div class="step-header">
+            <h1 class="step-title-main">Refinement preferences</h1>
+            <p class="step-subtitle">Set your default style and history option.</p>
+          </div>
+
+          <div class="setup-card">
+            <div class="style-list">
+              <div class="style-item active" data-style="Concise">
+                <div class="style-item-info">
+                  <h3 class="style-item-name">Concise &amp; Direct</h3>
+                  <p class="style-item-description">Strips fluff, keeps only essential instructions</p>
+                </div>
+                <div class="style-check">
+                  <span class="material-symbols-outlined">check</span>
+                </div>
+              </div>
+              
+              <div class="style-item" data-style="Balanced">
+                <div class="style-item-info">
+                  <h3 class="style-item-name">Balanced</h3>
+                  <p class="style-item-description">Improves clarity while maintaining original tone</p>
+                </div>
+                <div class="style-check">
+                  <span class="material-symbols-outlined">check</span>
+                </div>
+              </div>
+              
+              <div class="style-item" data-style="Professional">
+                <div class="style-item-info">
+                  <h3 class="style-item-name">Highly Professional</h3>
+                  <p class="style-item-description">Formal tone, structured format, extremely detailed</p>
+                </div>
+                <div class="style-check">
+                  <span class="material-symbols-outlined">check</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="setup-card">
+            <div class="toggle-container">
+              <div>
+                <p class="toggle-label">Save Prompt History</p>
+                <p class="toggle-hint">Keep a local history of your refined prompts (last 20)</p>
+              </div>
+              <input type="checkbox" class="toggle-switch" id="save-history">
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 5: Completion -->
+        <div class="step-container" id="step-5">
+          <div class="completion-screen">
+            <div class="completion-icon">
+              <span class="material-symbols-outlined">check_circle</span>
+            </div>
+            <h1 class="completion-title">You're all set.</h1>
+            <p class="completion-subtitle">Prompfix is ready to refine your prompts across the web.</p>
+            
+            <button class="btn-primary" id="finish-button">
+              <span>Launch Prompfix</span>
+              <span class="material-symbols-outlined">arrow_forward</span>
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div class="setup-card">
-        <div class="card-header">
-          <div class="card-icon">
-            <span class="material-symbols-outlined">history</span>
-          </div>
-          <h2 class="card-title">Save Prompt History</h2>
-        </div>
-        
-        <div class="toggle-container">
-          <div>
-            <p class="toggle-label">Enable History</p>
-            <p class="toggle-hint">Keep a local history of your refined prompts</p>
-          </div>
-          <input type="checkbox" class="toggle-switch" id="save-history">
-        </div>
-      </div>
-    </div>
-
-    <!-- Step 5: Completion -->
-    <div class="step-container" id="step-5">
-      <div class="completion-screen">
-        <div class="completion-icon">
-          <span class="material-symbols-outlined">check_circle</span>
-        </div>
-        <h2 class="completion-title">All Set!</h2>
-        <p class="completion-subtitle">Your AI prompt assistant is ready to use</p>
-        
-        <button class="btn-primary" id="finish-button" style="margin: 0 auto;">
-          <span class="material-symbols-outlined">rocket_launch</span>
-          <span>Launch Prompfix</span>
+      <!-- Bottom Navigation -->
+      <nav class="setup-nav" id="setup-nav">
+        <button class="btn-secondary" id="prev-button">
+          <span class="material-symbols-outlined">arrow_back</span>
+          <span>Back</span>
         </button>
-      </div>
-    </div>
-
-    <!-- Navigation -->
-    <nav class="setup-nav" id="setup-nav">
-      <button class="btn-secondary" id="prev-button" style="visibility: hidden;">
-        <span class="material-symbols-outlined">arrow_back</span>
-        <span>Back</span>
-      </button>
-      <button class="btn-primary" id="next-button">
-        <span>Continue</span>
-        <span class="material-symbols-outlined">arrow_forward</span>
-      </button>
-    </nav>
+        <button class="btn-primary" id="next-button">
+          <span>Continue</span>
+          <span class="material-symbols-outlined">arrow_forward</span>
+        </button>
+      </nav>
+    </main>
   </div>
 
   <script src="setup.js"></script>
