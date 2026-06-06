@@ -8,10 +8,15 @@ const manageKeysButton = document.getElementById('manage-keys-button');
 const notice = document.getElementById('notice');
 const statusModel = document.getElementById('status-model');
 
+const transparencySlider = document.getElementById('transparency-slider');
+const transparencyValue = document.getElementById('transparency-value');
+
 let selectedStyle = 'Clearer';
 let defaultMode = 'Balanced';
 let saveHistory = false;
 let promptHistory = [];
+
+let popupTransparency = 0.90; // 40-100 range mapped to 0.40-1.00
 
 // Initialize
 async function init() {
@@ -27,7 +32,8 @@ async function loadSettings() {
       'defaultMode',
       'saveHistory',
       'promptHistory',
-      'apiProvider'
+      'apiProvider',
+      'popupTransparency'
     ]);
 
     if (!stored.setupComplete) {
@@ -44,6 +50,11 @@ async function loadSettings() {
     // Update status model display
     if (stored.apiProvider) {
       statusModel.textContent = stored.apiProvider;
+    }
+
+    if (typeof stored.popupTransparency === 'number') {
+      // stored value expected as 0.40-1.00
+      popupTransparency = Math.min(1, Math.max(0.4, stored.popupTransparency));
     }
   } catch (error) {
     console.error('Failed to load settings:', error);
@@ -67,6 +78,30 @@ function setupEventListeners() {
   manageKeysButton.addEventListener('click', () => {
     chrome.tabs.create({ url: chrome.runtime.getURL('setup/setup.html') });
   });
+
+  // Transparency slider
+  if (transparencySlider) {
+    transparencySlider.value = String(Math.round(popupTransparency * 100));
+    updatePopupTransparencyUI();
+
+    const persist = async () => {
+      try {
+        const v = Number(transparencySlider.value); // 40-100
+        popupTransparency = Math.min(1, Math.max(0.4, v / 100));
+        await chrome.storage.local.set({ popupTransparency });
+      } catch (e) {
+        console.error('Failed to persist popupTransparency:', e);
+      }
+    };
+
+    transparencySlider.addEventListener('input', () => {
+      updatePopupTransparencyUI();
+    });
+
+    transparencySlider.addEventListener('change', () => {
+      persist();
+    });
+  }
 
   // Keyboard shortcut - Ctrl/Cmd + Enter to refine
   inputPrompt.addEventListener('keydown', (e) => {
@@ -108,24 +143,16 @@ async function handleRefine() {
 }
 
 function setLoadingState(loading) {
+  if (!refineButton) return;
+
   if (loading) {
     refineButton.disabled = true;
     refineButton.innerHTML = `
-      <span class="material-symbols-outlined" style="animation: spin 1s linear infinite;">refresh</span>
+      <span class="pf-spin" aria-hidden="true">
+        <span class="material-symbols-outlined" style="font-size: 20px; line-height: 1;">refresh</span>
+      </span>
       <span>Refining...</span>
     `;
-    // Add spin animation
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes spin {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-      }
-    `;
-    style.id = 'spin-animation';
-    if (!document.getElementById('spin-animation')) {
-      document.head.appendChild(style);
-    }
   } else {
     refineButton.disabled = false;
     refineButton.innerHTML = `
@@ -168,6 +195,24 @@ function showCopyFeedback() {
   setTimeout(() => {
     copyFeedback.classList.remove('show');
   }, 2000);
+}
+
+function updatePopupTransparencyUI() {
+  const v = transparencySlider ? Number(transparencySlider.value) : Math.round(popupTransparency * 100);
+  popupTransparency = Math.min(1, Math.max(0.4, v / 100));
+
+  const popup = document.getElementById('prompfix-popup');
+  if (popup) {
+    popup.style.setProperty('--pf-popup-opacity', String(popupTransparency));
+    // keep blur constant; if you want blur coupling later, can map here
+    if (popup.style.getPropertyValue('--pf-popup-blur') === '') {
+      popup.style.setProperty('--pf-popup-blur', '24px');
+    }
+  }
+
+  if (transparencyValue) {
+    transparencyValue.textContent = `${Math.round(popupTransparency * 100)}%`;
+  }
 }
 
 function showNotice(message, type = 'error') {

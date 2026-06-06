@@ -189,14 +189,16 @@ function removePanel() {
     panelElement.style.transition = 'all 0.2s ease';
     panelElement.style.opacity = '0';
     panelElement.style.transform = 'scale(0.98)';
-    
+
+    window.removeEventListener('keydown', handleEscToClose, true);
+
     setTimeout(() => {
       if (panelElement) {
         panelElement.remove();
         panelElement = null;
       }
     }, 200);
-    
+
     window.removeEventListener('mousedown', handleOutsideClick, true);
   }
 }
@@ -208,18 +210,25 @@ function handleOutsideClick(event) {
   }
 }
 
+function handleEscToClose(event) {
+  if (!panelElement) return;
+  if (event.key === 'Escape') {
+    removePanel();
+  }
+}
+
 function openPanel() {
   if (!activeTarget) return;
-  
+
   currentText = getTargetText(activeTarget);
   const panel = createPanel();
-  
+
   const outputBox = panel.querySelector('#prompfix-output');
   if (outputBox) {
     outputBox.classList.add('hidden');
     outputBox.textContent = '';
   }
-  
+
   // Focus on source textarea
   setTimeout(() => {
     const sourceTextarea = panel.querySelector('#prompfix-source');
@@ -228,6 +237,9 @@ function openPanel() {
       sourceTextarea.select();
     }
   }, 100);
+
+  // Esc closes panel (professional UX)
+  window.addEventListener('keydown', handleEscToClose, true);
 }
 
 function getTargetText(target) {
@@ -251,7 +263,7 @@ function setTargetText(target, text) {
 
 async function generateRefinement(commentMode = false, retry = false) {
   if (!panelElement) return;
-  
+
   const source = panelElement.querySelector('#prompfix-source');
   const mode = panelElement.querySelector('#prompfix-mode').value;
   const comment = panelElement.querySelector('#prompfix-comment').value.trim();
@@ -271,22 +283,28 @@ async function generateRefinement(commentMode = false, retry = false) {
   setLoadingState(true, generateButton, retryButton, reRefineButton);
 
   try {
-    const refined = await fetchRefinement(prompt, mode, 'Clearer', commentMode ? comment : '');
-    
-    outputBox.innerHTML = escapeHtml(refined);
+    // Keep UI consistent: use selected mode as the refinement style argument.
+    const refined = await fetchRefinement(
+      prompt,
+      mode,
+      mode,
+      commentMode ? comment : ''
+    );
+
+    outputBox.textContent = refined;
     outputBox.classList.remove('hidden');
-    
+
     // Update target text
     setTargetText(activeTarget, refined);
-    
+
     // Save to history
     if (settings.saveHistory) {
       saveHistoryEntry(prompt, refined);
     }
-    
+
     // Scroll to output
     outputBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    
+
   } catch (error) {
     outputBox.innerHTML = `<span style="color: #fca5a5;">Error: ${escapeHtml(error.message)}</span>`;
     outputBox.classList.remove('hidden');
