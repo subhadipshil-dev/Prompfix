@@ -87,9 +87,9 @@ body {
 
 /* === Header === */
 .popup-header {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
   padding: 16px 20px;
   border-bottom: 1px solid rgba(124, 58, 237, 0.1);
@@ -131,12 +131,15 @@ body {
 
 /* Transparency slider controls */
 .transparency-controls {
-  flex: 1;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 10px;
+
+  /* prevent layout overlap / blank right space */
   min-width: 0;
+  max-width: 240px;
+  overflow: hidden;
 }
 
 .transparency-label {
@@ -156,7 +159,7 @@ body {
 }
 
 .transparency-row input[type="range"] {
-  width: 120px;
+  width: 110px;
   accent-color: #7c3aed;
 }
 
@@ -164,7 +167,7 @@ body {
   font-size: 12px;
   color: var(--pf-text-secondary);
   font-weight: 600;
-  min-width: 48px;
+  min-width: 44px;
   text-align: right;
 }
 
@@ -180,6 +183,7 @@ body {
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
+  justify-self: end;
 }
 
 .settings-btn:hover {
