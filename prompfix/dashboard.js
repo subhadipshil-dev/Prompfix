@@ -53,11 +53,19 @@ let currentTab = 'dashboard';
 function showView(tab) {
   Object.values(VIEWS).forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.style.display = 'none';
+    if (el) {
+      el.style.display = 'none';
+      el.classList.remove('view-enter');
+    }
   });
 
   const viewEl = document.getElementById(VIEWS[tab]);
-  if (viewEl) viewEl.style.display = '';
+  if (viewEl) {
+    viewEl.style.display = '';
+    // Trigger animation
+    void viewEl.offsetWidth; // force reflow
+    viewEl.classList.add('view-enter');
+  }
 
   document.querySelectorAll('.nav-item').forEach(item => {
     item.classList.toggle('active', item.dataset.tab === tab);
@@ -361,4 +369,134 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
   });
+});
+
+/* ===================== Notification Panel ===================== */
+
+function initNotifications() {
+  const notifBtn = document.getElementById('notif-btn');
+  const notifPanel = document.getElementById('notif-panel');
+  const notifList = document.getElementById('notif-list');
+  const notifClear = document.getElementById('notif-clear');
+  const notifDot = document.getElementById('notif-dot');
+
+  if (!notifBtn || !notifPanel) return;
+
+  // Sample notifications (in real app, load from storage or background)
+  const notifications = [
+    {
+      id: 1,
+      icon: 'ti ti-check',
+      title: 'Refinement completed',
+      desc: 'Your "marketing email" prompt was refined successfully.',
+      time: '2m ago',
+      read: false
+    },
+    {
+      id: 2,
+      icon: 'ti ti-plug',
+      title: 'API usage alert',
+      desc: 'You have used 80% of your OpenAI tokens today.',
+      time: '1h ago',
+      read: false
+    },
+    {
+      id: 3,
+      icon: 'ti ti-chart-bar',
+      title: 'Weekly report ready',
+      desc: 'Your prompt activity summary for this week is available.',
+      time: 'Yesterday',
+      read: true
+    }
+  ];
+
+  function renderNotifications() {
+    notifList.innerHTML = '';
+
+    const unreadCount = notifications.filter(n => !n.read).length;
+
+    if (unreadCount > 0) {
+      notifDot.style.display = 'block';
+    } else {
+      notifDot.style.display = 'none';
+    }
+
+    if (notifications.length === 0) {
+      notifList.innerHTML = `<div style="padding:16px; color:#555; text-align:center;">No new notifications</div>`;
+      return;
+    }
+
+    notifications.forEach(notif => {
+      const item = document.createElement('div');
+      item.className = 'notif-item';
+      if (notif.read) item.style.opacity = '0.7';
+
+      item.innerHTML = `
+        <div class="notif-icon">
+          <i class="${notif.icon}"></i>
+        </div>
+        <div class="notif-content">
+          <div class="notif-title">${notif.title}</div>
+          <div class="notif-desc">${notif.desc}</div>
+          <div class="notif-time">${notif.time}</div>
+        </div>
+      `;
+
+      // Click to mark as read
+      item.addEventListener('click', () => {
+        notif.read = true;
+        renderNotifications();
+      });
+
+      notifList.appendChild(item);
+    });
+  }
+
+  // Toggle panel
+  notifBtn.addEventListener('click', (e) => {
+    e.stopImmediatePropagation();
+    const isVisible = notifPanel.style.display === 'block';
+
+    if (isVisible) {
+      notifPanel.style.display = 'none';
+    } else {
+      notifPanel.style.display = 'block';
+      renderNotifications();
+    }
+  });
+
+  // Close when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!notifPanel.contains(e.target) && !notifBtn.contains(e.target)) {
+      notifPanel.style.display = 'none';
+    }
+  });
+
+  // Mark all as read
+  if (notifClear) {
+    notifClear.addEventListener('click', (e) => {
+      e.stopImmediatePropagation();
+      notifications.forEach(n => n.read = true);
+      renderNotifications();
+    });
+  }
+
+  // Initial render (hidden)
+  renderNotifications();
+
+  // Optional: simulate new notification after some time (for demo)
+  setTimeout(() => {
+    if (notifDot) {
+      notifDot.style.display = 'block';
+    }
+  }, 15000);
+}
+
+// Initialize notifications after DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  // The main initNavigation is already called.
+  // We can call this after a short delay or integrate.
+  setTimeout(() => {
+    initNotifications();
+  }, 300);
 });

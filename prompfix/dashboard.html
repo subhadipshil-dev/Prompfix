@@ -131,8 +131,8 @@
     /* Notification Panel Styles */
     .notif-panel {
       position: absolute;
-      top: 60px;
-      right: 24px;
+      top: 48px;
+      right: 0;
       width: 320px;
       background: #1a1a1a;
       border: 1px solid #252525;
@@ -236,6 +236,99 @@
 
     .notif-link:hover {
       text-decoration: underline;
+    }
+
+    /* Animations throughout the UI */
+    .nav-item {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .nav-item:hover {
+      transform: translateX(2px);
+    }
+
+    .card {
+      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
+                  box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                  border-color 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      border-color: #333;
+    }
+
+    .mode-pill {
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .mode-pill:hover {
+      transform: scale(1.02);
+    }
+
+    .hist-item {
+      transition: background 0.15s ease, transform 0.15s ease;
+    }
+
+    .hist-item:hover {
+      background: #222;
+      transform: translateX(2px);
+    }
+
+    .api-btn, .inner-pill {
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .api-btn:hover, .inner-pill:hover {
+      transform: translateY(-1px);
+    }
+
+    .notif-btn {
+      transition: transform 0.2s ease;
+    }
+
+    .notif-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .notif-item {
+      transition: background 0.15s ease;
+    }
+
+    .notif-panel {
+      animation: slideDown 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-origin: top right;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .view-enter {
+      animation: fadeInUp 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .big-num {
+      transition: all 0.3s ease;
     }
   </style>
 </head>
