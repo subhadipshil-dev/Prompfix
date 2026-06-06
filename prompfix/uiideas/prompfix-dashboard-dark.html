@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Prompfix – Dashboard</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0a0a0a; font-family: 'DM Sans', sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+
+    .shell { display: flex; width: 100%; max-width: 1100px; min-height: 680px; background: #0f0f0f; border-radius: 20px; padding: 12px; gap: 12px; border: 1px solid #1e1e1e; }
+
+    /* ── Sidebar ── */
+    .sidebar { width: 200px; min-width: 200px; background: #111111; border-radius: 14px; display: flex; flex-direction: column; padding: 20px 14px; gap: 4px; border: 1px solid #1e1e1e; }
+    .logo { display: flex; align-items: center; gap: 8px; padding: 0 4px 20px; color: #fff; font-weight: 700; font-size: 16px; }
+    .logo-icon { width: 28px; height: 28px; background: #c8f565; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #0a0a0a; font-weight: 900; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: #555; font-size: 13px; font-weight: 500; cursor: pointer; transition: all .15s; position: relative; text-decoration: none; }
+    .nav-item:hover { color: #ccc; background: #1a1a1a; }
+    .nav-item.active { background: #1a1a1a; color: #c8f565; }
+    .nav-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 60%; background: #c8f565; border-radius: 2px; }
+    .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+    .badge { margin-left: auto; background: #c8f565; color: #0a0a0a; font-size: 10px; font-weight: 700; border-radius: 20px; padding: 1px 7px; }
+    .badge-red { background: #ff4444; color: #fff; }
+    .sidebar-bottom { margin-top: auto; }
+    .api-card { background: #1a1a1a; border: 1px solid #252525; border-radius: 12px; padding: 14px; margin-top: 8px; }
+    .api-card h4 { font-size: 12px; font-weight: 700; color: #c8f565; margin-bottom: 4px; }
+    .api-card p { font-size: 11px; color: #555; margin-bottom: 10px; line-height: 1.4; }
+    .api-btn { width: 100%; background: #c8f565; color: #0a0a0a; border: none; border-radius: 8px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; }
+
+    /* ── Main ── */
+    .main { flex: 1; background: #141414; border-radius: 14px; display: flex; flex-direction: column; overflow: hidden; border: 1px solid #1e1e1e; }
+    .topbar { display: flex; align-items: center; gap: 12px; padding: 18px 24px 0; }
+    .profile-pill { display: flex; align-items: center; gap: 10px; background: #1a1a1a; border: 1px solid #252525; border-radius: 40px; padding: 6px 14px 6px 6px; cursor: pointer; }
+    .avatar { width: 32px; height: 32px; border-radius: 50%; background: #c8f565; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #0a0a0a; }
+    .profile-name { font-size: 13px; font-weight: 600; color: #ddd; line-height: 1.2; }
+    .profile-sub { font-size: 11px; color: #444; }
+    .search-bar { flex: 1; display: flex; align-items: center; gap: 8px; background: #1a1a1a; border: 1px solid #252525; border-radius: 40px; padding: 8px 16px; max-width: 340px; margin-left: auto; }
+    .search-bar input { border: none; outline: none; font-size: 13px; color: #aaa; background: transparent; width: 100%; font-family: inherit; }
+    .search-bar input::placeholder { color: #444; }
+    .search-bar i { color: #444; font-size: 16px; }
+    .notif-btn { width: 36px; height: 36px; background: #1a1a1a; border: 1px solid #252525; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; }
+    .notif-btn i { font-size: 18px; color: #555; }
+    .notif-dot { position: absolute; top: 7px; right: 8px; width: 7px; height: 7px; background: #c8f565; border-radius: 50%; border: 2px solid #141414; }
+
+    /* ── Content ── */
+    .content { padding: 20px 24px; flex: 1; overflow: auto; }
+    .page-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 4px; }
+    .page-title { font-size: 30px; font-weight: 700; color: #fff; letter-spacing: -0.5px; }
+    .date-pill { display: flex; align-items: center; gap: 6px; background: #1a1a1a; border: 1px solid #252525; border-radius: 8px; padding: 6px 12px; font-size: 12px; color: #666; font-weight: 500; cursor: pointer; }
+    .page-sub { font-size: 13px; color: #444; margin-bottom: 18px; }
+
+    /* ── Cards grid ── */
+    .cards-row { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .card { background: #1a1a1a; border: 1px solid #252525; border-radius: 16px; padding: 18px; position: relative; }
+    .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .card-title { font-size: 12px; font-weight: 600; color: #555; display: flex; align-items: center; gap: 6px; }
+    .card-title i { font-size: 15px; color: #444; }
+    .card-menu { font-size: 16px; color: #333; cursor: pointer; letter-spacing: 2px; line-height: 1; }
+    .big-num { font-size: 30px; font-weight: 700; color: #fff; line-height: 1; display: inline; }
+    .big-unit { font-size: 13px; font-weight: 400; color: #555; margin-left: 2px; }
+    .tag-pill { display: inline-flex; align-items: center; font-size: 10px; font-weight: 700; background: rgba(200,245,101,0.15); color: #c8f565; border-radius: 20px; padding: 2px 8px; margin-left: 8px; }
+    .tag-pill.blue { background: rgba(99,160,255,0.12); color: #63a0ff; }
+    .sub-label { font-size: 11px; color: #444; margin-top: 2px; }
+
+    /* venn bubbles */
+    .venn-area { display: flex; justify-content: center; align-items: center; height: 130px; margin: 10px 0; position: relative; }
+    .bubble { border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; position: absolute; font-weight: 700; }
+    .b1 { width: 90px; height: 90px; background: rgba(200,245,101,0.18); border: 1.5px solid rgba(200,245,101,0.3); left: 22px; top: 12px; font-size: 18px; color: #c8f565; }
+    .b2 { width: 80px; height: 80px; background: #252525; border: 1.5px solid #333; right: 14px; top: 10px; font-size: 16px; color: #fff; }
+    .b3 { width: 68px; height: 68px; background: rgba(111,124,255,0.2); border: 1.5px solid rgba(111,124,255,0.35); bottom: 2px; left: 50%; transform: translateX(-50%); font-size: 14px; color: #a0aaff; }
+    .b-label { font-size: 9px; font-weight: 500; opacity: .7; }
+
+    /* stat bars */
+    .stat-bars { margin-top: 8px; }
+    .stat-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 10px; }
+    .stat-label { font-size: 11px; color: #555; min-width: 60px; }
+    .stat-bar-wrap { flex: 1; height: 5px; background: #222; border-radius: 3px; overflow: hidden; }
+    .stat-bar { height: 100%; border-radius: 3px; background: #444; }
+    .stat-bar.lime { background: #c8f565; }
+    .stat-bar.purple { background: #6f7cff; }
+    .stat-dot { width: 7px; height: 7px; border-radius: 50%; background: #444; flex-shrink: 0; }
+    .stat-dot.lime { background: #c8f565; }
+    .stat-dot.purple { background: #6f7cff; }
+
+    /* dot grid */
+    .dot-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 5px; margin-top: 12px; }
+    .dot { width: 9px; height: 9px; border-radius: 50%; background: #222; }
+    .dot.active { background: #6f7cff; }
+    .dot.mid { background: #3a3a6a; }
+
+    /* bottom row */
+    .bottom-row { display: grid; grid-template-columns: 1fr 1.6fr; gap: 12px; }
+    .accent-card { background: #111; border: 1px solid #252525; border-radius: 16px; padding: 18px; }
+
+    /* mode pills */
+    .mode-pills { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+    .mode-pill { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; border: 1px solid #2a2a2a; color: #444; cursor: pointer; transition: all .15s; background: transparent; }
+    .mode-pill:hover { border-color: #444; color: #888; }
+    .mode-pill.active { background: rgba(200,245,101,0.1); color: #c8f565; border-color: rgba(200,245,101,0.3); }
+
+    /* history */
+    .history-list { margin-top: 12px; display: flex; flex-direction: column; gap: 7px; }
+    .hist-item { background: #1a1a1a; border: 1px solid #222; border-radius: 10px; padding: 9px 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .hist-orig { font-size: 11px; color: #555; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; }
+    .hist-refined { font-size: 11px; color: #c8f565; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px; opacity: .8; }
+    .hist-time { font-size: 10px; color: #333; flex-shrink: 0; }
+
+    /* bar chart */
+    .bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 80px; margin-top: 14px; padding-bottom: 4px; }
+    .bar-group { display: flex; gap: 3px; align-items: flex-end; flex: 1; }
+    .bar { width: 13px; border-radius: 3px 3px 0 0; }
+    .bar.lime { background: rgba(200,245,101,0.7); }
+    .bar.lime.highlight { background: #c8f565; }
+    .bar.purple { background: rgba(111,124,255,0.45); }
+    .bar.purple.highlight { background: #6f7cff; }
+    .bar-label { font-size: 10px; color: #444; text-align: center; margin-top: 4px; }
+    .bar-col { display: flex; flex-direction: column; align-items: center; flex: 1; }
+
+    .inner-pill { background: #222; border: 1px solid #2a2a2a; border-radius: 6px; padding: 4px 10px; font-size: 11px; color: #555; cursor: pointer; }
+    .info-box { margin-top: 10px; padding: 10px; background: #111; border: 1px solid #222; border-radius: 10px; }
+    .info-box .lbl { font-size: 11px; color: #444; margin-bottom: 6px; }
+    .info-box .val { font-size: 13px; font-weight: 600; color: #ccc; display: flex; align-items: center; gap: 6px; }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #c8f565; display: inline-block; }
+    .legend { display: flex; gap: 14px; margin-top: 8px; }
+    .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #444; }
+    .legend-box { width: 10px; height: 10px; border-radius: 2px; }
+    .divider { height: 1px; background: #1e1e1e; margin: 12px 0; }
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ── Sidebar ── -->
+  <div class="sidebar">
+    <div class="logo">
+      <div class="logo-icon">P</div>
+      prompfix
+    </div>
+
+    <a class="nav-item active" href="#">
+      <i class="ti ti-layout-dashboard nav-icon"></i>
+      Dashboard
+      <span class="badge">3</span>
+    </a>
+    <a class="nav-item" href="#">
+      <i class="ti ti-api nav-icon"></i>
+      APIs
+    </a>
+    <a class="nav-item" href="#">
+      <i class="ti ti-user nav-icon"></i>
+      Profile
+    </a>
+    <a class="nav-item" href="#">
+      <i class="ti ti-adjustments-horizontal nav-icon"></i>
+      Refine Mode
+    </a>
+    <a class="nav-item" href="#">
+      <i class="ti ti-settings nav-icon"></i>
+      Settings
+    </a>
+    <a class="nav-item" href="#">
+      <i class="ti ti-history nav-icon"></i>
+      History
+      <span class="badge badge-red">1</span>
+    </a>
+    <a class="nav-item" href="#">
+      <i class="ti ti-lifebuoy nav-icon"></i>
+      Support
+    </a>
+
+    <div class="sidebar-bottom">
+      <div class="api-card">
+        <h4>Connect API</h4>
+        <p>Add your OpenAI or Claude key to start refining prompts.</p>
+        <button class="api-btn">Add API Key</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Main ── -->
+  <div class="main">
+
+    <div class="topbar">
+      <div class="profile-pill">
+        <div class="avatar">S</div>
+        <div>
+          <div class="profile-name">Subhadip</div>
+          <div class="profile-sub">Free plan</div>
+        </div>
+        <span style="color:#444;font-size:13px;margin-left:4px">⌄</span>
+      </div>
+
+      <div class="search-bar">
+        <i class="ti ti-search"></i>
+        <input type="text" placeholder="Search history, settings..." />
+      </div>
+
+      <div class="notif-btn">
+        <i class="ti ti-bell"></i>
+        <div class="notif-dot"></div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="page-header">
+        <div class="page-title">Prompt Overview</div>
+        <div class="date-pill">
+          <i class="ti ti-calendar" style="font-size:13px"></i>
+          7 Jun, 2026 &nbsp; Today ⌄
+        </div>
+      </div>
+      <div class="page-sub">Your prompt refinement stats at a glance</div>
+
+      <div class="cards-row">
+
+        <!-- Card 1: Prompts Refined -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="ti ti-writing"></i> Prompts Refined</div>
+            <div class="card-menu">···</div>
+          </div>
+          <div>
+            <span class="big-num">128</span>
+            <span class="big-unit">total</span>
+            <span class="tag-pill">+12%</span>
+          </div>
+          <div class="sub-label">Since you installed Prompfix</div>
+
+          <div class="venn-area">
+            <div class="bubble b1">42<div class="b-label">Basic</div></div>
+            <div class="bubble b2">55<div class="b-label">Advanced</div></div>
+            <div class="bubble b3">31<div class="b-label">Balanced</div></div>
+          </div>
+
+          <div class="stat-bars">
+            <div class="stat-row">
+              <span class="stat-label">Basic</span>
+              <div class="stat-bar-wrap"><div class="stat-bar lime" style="width:33%"></div></div>
+              <div class="stat-dot lime"></div>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Advanced</span>
+              <div class="stat-bar-wrap"><div class="stat-bar" style="width:43%"></div></div>
+              <div class="stat-dot"></div>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Balanced</span>
+              <div class="stat-bar-wrap"><div class="stat-bar purple" style="width:24%"></div></div>
+              <div class="stat-dot purple"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: API Calls -->
+        <div class="card" style="display:flex;flex-direction:column">
+          <div class="card-header">
+            <div class="card-title"><i class="ti ti-plug"></i> API Calls Today</div>
+            <div class="card-menu">···</div>
+          </div>
+          <div>
+            <span class="big-num">24</span>
+            <span class="big-unit">calls</span>
+          </div>
+          <div class="sub-label">Avg <strong style="color:#888">18 calls</strong> per day</div>
+
+          <div class="info-box">
+            <div class="lbl">Provider active</div>
+            <div class="val"><span class="status-dot"></span>OpenAI GPT-4o</div>
+          </div>
+
+          <div class="info-box">
+            <div class="lbl">Tokens used today</div>
+            <div class="stat-bar-wrap" style="height:7px;border-radius:4px">
+              <div class="stat-bar lime" style="width:61%"></div>
+            </div>
+            <div style="font-size:11px;color:#444;margin-top:4px">14.2k / 25k</div>
+          </div>
+        </div>
+
+        <!-- Card 3: Clarity Score -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="ti ti-sparkles"></i> Clarity Score</div>
+            <div class="card-menu">···</div>
+          </div>
+          <div>
+            <span class="big-num">84</span>
+            <span class="big-unit">/ 100</span>
+            <span class="tag-pill blue">+10%</span>
+          </div>
+
+          <div class="dot-grid">
+            <div class="dot active"></div><div class="dot active"></div><div class="dot active"></div><div class="dot active"></div>
+            <div class="dot active"></div><div class="dot active"></div><div class="dot mid"></div><div class="dot"></div>
+            <div class="dot active"></div><div class="dot mid"></div><div class="dot"></div><div class="dot"></div>
+            <div class="dot mid"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+          </div>
+          <div style="font-size:11px;color:#333;margin-top:8px">Based on output specificity &amp; structure</div>
+        </div>
+
+      </div>
+
+      <div class="bottom-row">
+
+        <!-- Dark accent card: Mode + History -->
+        <div class="accent-card">
+          <div class="card-header">
+            <div class="card-title" style="color:#666"><i class="ti ti-moon" style="color:#555"></i> Active Mode</div>
+            <div class="inner-pill">Change ⌄</div>
+          </div>
+          <div style="font-size:24px;font-weight:700;color:#c8f565;line-height:1">Advanced</div>
+          <div style="font-size:11px;color:#333;margin-top:3px">Full rewrite · context-rich · structured</div>
+
+          <div class="mode-pills">
+            <div class="mode-pill">Basic</div>
+            <div class="mode-pill">Balanced</div>
+            <div class="mode-pill active">Advanced</div>
+            <div class="mode-pill">Coding</div>
+            <div class="mode-pill">Shorter</div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div style="font-size:11px;color:#333;margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:.5px">Recent</div>
+          <div class="history-list">
+            <div class="hist-item">
+              <span class="hist-orig">write email job</span>
+              <span class="hist-refined">Write a professional application…</span>
+              <span class="hist-time">2m ago</span>
+            </div>
+            <div class="hist-item">
+              <span class="hist-orig">make code better</span>
+              <span class="hist-refined">Refactor this function for readability…</span>
+              <span class="hist-time">1h ago</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bar chart card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="ti ti-chart-bar"></i> Weekly Refinements</div>
+            <div class="inner-pill">Monthly ⌄</div>
+          </div>
+          <div style="display:flex;gap:24px;margin-bottom:4px">
+            <div>
+              <div style="font-size:22px;font-weight:700;color:#fff;line-height:1">
+                128 <span style="font-size:13px;color:#c8f565;font-weight:600">↑</span>
+              </div>
+              <div style="font-size:11px;color:#444">Total prompts</div>
+            </div>
+            <div>
+              <div style="font-size:22px;font-weight:700;color:#fff;line-height:1">
+                6 <span style="font-size:11px;font-weight:400;color:#555">today</span>
+              </div>
+              <div style="font-size:11px;color:#444">Refined today</div>
+            </div>
+          </div>
+
+          <div class="bar-chart">
+            <div class="bar-col">
+              <div class="bar-group"><div class="bar lime" style="height:40px"></div><div class="bar purple" style="height:25px"></div></div>
+              <div class="bar-label">Mon</div>
+            </div>
+            <div class="bar-col">
+              <div class="bar-group"><div class="bar lime" style="height:55px"></div><div class="bar purple" style="height:35px"></div></div>
+              <div class="bar-label">Tue</div>
+            </div>
+            <div class="bar-col">
+              <div class="bar-group"><div class="bar lime" style="height:30px"></div><div class="bar purple" style="height:20px"></div></div>
+              <div class="bar-label">Wed</div>
+            </div>
+            <div class="bar-col">
+              <div class="bar-group"><div class="bar lime highlight" style="height:65px"></div><div class="bar purple highlight" style="height:50px"></div></div>
+              <div class="bar-label" style="color:#c8f565;font-weight:600">Thu</div>
+            </div>
+            <div class="bar-col">
+              <div class="bar-group"><div class="bar lime" style="height:48px"></div><div class="bar purple" style="height:30px"></div></div>
+              <div class="bar-label">Fri</div>
+            </div>
+            <div class="bar-col">
+              <div class="bar-group"><div class="bar lime" style="height:20px"></div><div class="bar purple" style="height:15px"></div></div>
+              <div class="bar-label">Sat</div>
+            </div>
+            <div class="bar-col">
+              <div class="bar-group"><div class="bar lime" style="height:35px"></div><div class="bar purple" style="height:18px"></div></div>
+              <div class="bar-label">Sun</div>
+            </div>
+          </div>
+
+          <div class="legend">
+            <div class="legend-item"><div class="legend-box" style="background:rgba(200,245,101,0.7)"></div>Refined</div>
+            <div class="legend-item"><div class="legend-box" style="background:rgba(111,124,255,0.45)"></div>Retried</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

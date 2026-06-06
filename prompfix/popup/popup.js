@@ -82,9 +82,9 @@ function setupEventListeners() {
   // Copy button
   copyButton.addEventListener('click', handleCopy);
 
-  // Settings button
+  // Settings / Dashboard button
   manageKeysButton.addEventListener('click', () => {
-    chrome.tabs.create({ url: chrome.runtime.getURL('setup/setup.html') });
+    chrome.tabs.create({ url: chrome.runtime.getURL('dashboard.html') });
   });
 
   // Keyboard shortcut - Ctrl/Cmd + Enter to refine
