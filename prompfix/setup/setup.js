@@ -238,12 +238,22 @@ async function finishSetup() {
     return;
   }
 
+  // Capture selected style/mode from step 4 if present (map to runtime modes)
+  const activeStyleItem = document.querySelector('.style-item.active');
+  let chosenMode = 'Balanced';
+  if (activeStyleItem) {
+    const s = activeStyleItem.dataset.style;
+    if (s === 'Concise') chosenMode = 'Shorter';
+    else if (s === 'Professional') chosenMode = 'Professional';
+    else if (s === 'Balanced') chosenMode = 'Balanced';
+  }
+
   const dataToSave = {
     setupComplete: true,
     firstName: displayNameInput?.value.trim() || 'Developer',
     socialLink: socialLinkInput?.value.trim() || '',
     apiProvider: apiProviderSelect?.value || 'OpenAI',
-    defaultMode: 'Balanced', // real runtime modes: Basic | Balanced | Advanced (setup styles are visual only for now)
+    defaultMode: chosenMode,
     saveHistory: saveHistoryInput?.checked || false,
     promptHistory: []
   };

@@ -19,5 +19,6 @@
       "css": ["content/content.css"],
       "run_at": "document_idle"
     }
-  ]
+  ],
+  "options_page": "dashboard.html"
 }

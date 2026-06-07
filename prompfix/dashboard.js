@@ -259,7 +259,8 @@ function renderRefineMode(currentMode) {
     Balanced: 'Improve clarity while maintaining original tone.',
     Advanced: 'Full rewrite with context, structure, and depth.',
     Coding: 'Optimize for technical accuracy and code clarity.',
-    Shorter: 'Make it concise while keeping essential meaning.'
+    Shorter: 'Make it concise while keeping essential meaning.',
+    Professional: 'Formal tone, structured format, extremely polished.'
   };
 
   pills.forEach(pill => {

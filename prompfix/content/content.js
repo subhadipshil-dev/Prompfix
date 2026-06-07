@@ -212,13 +212,17 @@ function createPanel() {
   panel.innerHTML = `
     <div class="panel-header" id="panel-drag-handle">
       <div class="header-left">
-        <div class="header-icon"><i class="ti ti-sparkles"></i></div>
+        <div class="header-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L13.6 7.2L19 8.8L13.6 10.4L12 15.6L10.4 10.4L5 8.8L10.4 7.2L12 2Z"/><circle cx="17.5" cy="5.5" r="1.8"/></svg>
+        </div>
         <div>
           <div class="panel-title">Refine Prompt</div>
           <div class="panel-subtitle">Powered by Prompfix · ${settings.apiProvider || 'OpenAI'}</div>
         </div>
       </div>
-      <div class="close-btn" id="panel-close"><i class="ti ti-x"></i></div>
+      <div class="close-btn" id="panel-close">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </div>
     </div>
 
     <!-- Opacity adjustment bar -->
@@ -256,10 +260,10 @@ function createPanel() {
       <!-- Generate / Retry -->
       <div class="btn-row">
         <button class="btn-generate" id="btn-generate">
-          <i class="ti ti-sparkles" style="font-size:15px"></i> Generate
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" style="margin-right:2px"><path d="M12 2L13.6 7.2L19 8.8L13.6 10.4L12 15.6L10.4 10.4L5 8.8L10.4 7.2L12 2Z"/><circle cx="17.5" cy="5.5" r="1.8"/></svg> Generate
         </button>
         <button class="btn-retry" id="btn-retry">
-          <i class="ti ti-refresh" style="font-size:15px"></i> Retry
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:2px"><path d="M3 2v6h6"/><path d="M21 12A9 9 0 0 0 6 5.3L3 8"/><path d="M21 22v-6h-6"/><path d="M3 12a9 9 0 0 0 15 6.7l3-2.7"/></svg> Retry
         </button>
       </div>
 
@@ -269,7 +273,7 @@ function createPanel() {
         <div class="output-text" id="output-text"></div>
         <div class="output-actions">
           <button class="oa-btn oa-use" id="btn-use">Use this</button>
-          <button class="oa-btn oa-copy" id="btn-copy"><i class="ti ti-copy" style="font-size:13px"></i> Copy</button>
+          <button class="oa-btn oa-copy" id="btn-copy"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:2px"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy</button>
         </div>
       </div>
 
@@ -277,14 +281,14 @@ function createPanel() {
       <div class="add-instr">
         <div class="add-instr-header">
           <div class="add-instr-title">
-            <i class="ti ti-message-dots" style="font-size:14px;color:#333"></i>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
             Additional instructions
             <span class="opt-badge">optional</span>
           </div>
         </div>
         <input id="instr-input" class="instr-input" type="text" placeholder="e.g., Make it shorter, more formal, add examples…" />
         <button class="btn-rerefine" id="btn-rerefine">
-          <i class="ti ti-arrows-exchange" style="font-size:15px"></i>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px"><path d="M3 2v6h6"/><path d="M21 12A9 9 0 0 0 6 5.3L3 8"/><path d="M21 22v-6h-6"/><path d="M3 12a9 9 0 0 0 15 6.7l3-2.7"/></svg>
           Re-refine with comment
         </button>
       </div>
@@ -294,7 +298,7 @@ function createPanel() {
     <!-- Footer -->
     <div class="panel-footer">
       <div class="footer-hint">
-        <i class="ti ti-lock-filled"></i>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         API key stays on your device
       </div>
       <div class="footer-hint">Press <span class="kbd">Esc</span> to close</div>
@@ -564,7 +568,7 @@ function openPanel() {
   // The new panel already sets up the output box as display:none and handles Esc internally in createPanel.
   // Focus the original textarea
   setTimeout(() => {
-    const sourceTextarea = panel.querySelector('#prompfix-source');
+    const sourceTextarea = panel.querySelector('#orig-textarea');
     if (sourceTextarea) {
       sourceTextarea.focus();
       sourceTextarea.select();
@@ -594,20 +598,21 @@ function setTargetText(target, text) {
 async function generateRefinement(commentMode = false, retry = false) {
   if (!panelElement) return;
 
-  const source = panelElement.querySelector('#prompfix-source');
+  const source = panelElement.querySelector('#orig-textarea');
   const activePill = panelElement.querySelector('.mpill.active');
   const mode = activePill ? activePill.dataset.mode : (settings.defaultMode || 'Advanced');
-  const comment = panelElement.querySelector('#prompfix-comment').value.trim();
-  const outputBox = panelElement.querySelector('#prompfix-output');
-  const outputTextEl = panelElement.querySelector('#prompfix-output-text');
-  const generateButton = panelElement.querySelector('#prompfix-generate');
-  const retryButton = panelElement.querySelector('#prompfix-retry');
-  const reRefineButton = panelElement.querySelector('#prompfix-rerefine');
+  const commentEl = panelElement.querySelector('#instr-input');
+  const comment = commentEl ? commentEl.value.trim() : '';
+  const outputBox = panelElement.querySelector('#output-preview');
+  const outputTextEl = panelElement.querySelector('#output-text');
+  const generateButton = panelElement.querySelector('#btn-generate');
+  const retryButton = panelElement.querySelector('#btn-retry');
+  const reRefineButton = panelElement.querySelector('#btn-rerefine');
 
-  const prompt = source.value.trim();
+  const prompt = source ? source.value.trim() : '';
   if (!prompt) {
-    outputBox.style.display = 'block';
-    outputTextEl.textContent = 'Please enter text to refine.';
+    if (outputBox) outputBox.style.display = 'block';
+    if (outputTextEl) outputTextEl.textContent = 'Please enter text to refine.';
     return;
   }
 
@@ -622,12 +627,12 @@ async function generateRefinement(commentMode = false, retry = false) {
     );
 
     // Show output box and stream the text character by character
-    outputBox.style.display = 'block';
-    outputTextEl.textContent = '';
+    if (outputBox) outputBox.style.display = 'block';
+    if (outputTextEl) outputTextEl.textContent = '';
 
     let i = 0;
     const stream = setInterval(() => {
-      outputTextEl.textContent += refined[i] || '';
+      if (outputTextEl) outputTextEl.textContent += refined[i] || '';
       i++;
       if (i >= refined.length) {
         clearInterval(stream);
@@ -638,8 +643,8 @@ async function generateRefinement(commentMode = false, retry = false) {
     }, 12);
 
   } catch (error) {
-    outputBox.style.display = 'block';
-    outputTextEl.innerHTML = `<span style="color:#fca5a5;">Error: ${escapeHtml(error.message)}</span>`;
+    if (outputBox) outputBox.style.display = 'block';
+    if (outputTextEl) outputTextEl.innerHTML = `<span style="color:#fca5a5;">Error: ${escapeHtml(error.message)}</span>`;
   } finally {
     setLoadingState(false, generateButton, retryButton, reRefineButton);
   }
@@ -652,14 +657,14 @@ function setLoadingState(loading, generateButton, retryButton, reRefineButton) {
     buttons.forEach(btn => {
       btn.disabled = true;
       if (btn.classList.contains('btn-generate')) {
-        btn.innerHTML = '<i class="ti ti-refresh" style="font-size:15px"></i> Working...';
+        btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px"><path d="M3 2v6h6"/><path d="M21 12A9 9 0 0 0 6 5.3L3 8"/></svg> Working...';
       }
     });
   } else {
     buttons.forEach(btn => {
       btn.disabled = false;
       if (btn.classList.contains('btn-generate')) {
-        btn.innerHTML = '<i class="ti ti-sparkles" style="font-size:15px"></i> Generate';
+        btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" style="margin-right:4px"><path d="M12 2L13.6 7.2L19 8.8L13.6 10.4L12 15.6L10.4 10.4L5 8.8L10.4 7.2L12 2Z"/><circle cx="17.5" cy="5.5" r="1.8"/></svg> Generate';
       }
     });
   }
@@ -682,16 +687,7 @@ async function loadSettings() {
   }
 }
 
-async function saveHistoryEntry(input, output) {
-  try {
-    const stored = await chrome.storage.local.get(['promptHistory']);
-    const promptHistory = Array.isArray(stored.promptHistory) ? stored.promptHistory : [];
-    const updated = [...promptHistory, { input, output, timestamp: Date.now() }].slice(-20);
-    await chrome.storage.local.set({ promptHistory: updated });
-  } catch (error) {
-    console.error('Failed to save history:', error);
-  }
-}
+// saveHistoryEntry provided by api.js (loaded before this script)
 
 function inspectFocus(event) {
   const target = event.target;

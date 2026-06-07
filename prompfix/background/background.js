@@ -2,7 +2,10 @@
 const MODE_PROMPTS = {
   Basic: 'Fix grammar, spelling, punctuation, and verb usage only. Keep original wording as close as possible.',
   Balanced: 'Improve grammar, sentence structure, and clarity. Rearrange if needed. Do not change the core meaning.',
-  Advanced: 'Rewrite the prompt entirely with stronger context, clearer structure, and a more complete instruction. Preserve the user\'s original intent.'
+  Advanced: 'Rewrite the prompt entirely with stronger context, clearer structure, and a more complete instruction. Preserve the user\'s original intent.',
+  Coding: 'Rewrite as a clear, specific developer request with technical precision. Emphasize code structure, edge cases, and requirements.',
+  Shorter: 'Remove unnecessary words. Keep it concise but complete.',
+  Professional: 'Improve the tone to be professional and polished.'
 };
 
 // Style Prompts

@@ -656,7 +656,7 @@
   background: rgba(124, 58, 237, 0.5);
 }
 
-/* === Cool smooth animations (performant: ONLY transform + opacity to avoid slowing the extension) === */
+/* === Animations (performant: ONLY transform + opacity) === */
 
 /* Panel inner elements entrance */
 .prompfix-panel header,
@@ -669,9 +669,6 @@
 .prompfix-panel header { animation-delay: 40ms; }
 .prompfix-panel > div:nth-of-type(1) { animation-delay: 70ms; }
 .prompfix-panel > div:nth-of-type(2) { animation-delay: 100ms; }
-.prompfix-panel .button-row { animation-delay: 130ms; }
-.prompfix-panel .status-text { animation-delay: 150ms; }
-.prompfix-panel .comment-section { animation-delay: 170ms; }
 
 @keyframes panelItemFade {
   to {
@@ -680,8 +677,8 @@
   }
 }
 
-/* Output reveal (when .hidden is removed by JS) */
-.prompfix-panel .output-box:not(.hidden) {
+/* Output reveal */
+.prompfix-panel .output-preview {
   animation: outputReveal 0.32s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
@@ -694,34 +691,4 @@
     opacity: 1;
     transform: translateY(0) scale(1);
   }
-}
-
-/* Primary/secondary buttons — cooler hover + press */
-.prompfix-panel .primary-button,
-.prompfix-panel .secondary-button {
-  transition: transform 0.18s cubic-bezier(0.25, 0.1, 0.25, 1),
-              box-shadow 0.18s cubic-bezier(0.25, 0.1, 0.25, 1),
-              background 0.18s ease;
-  will-change: transform;
-}
-
-.prompfix-panel .primary-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(124, 58, 237, 0.26);
-}
-
-.prompfix-panel .primary-button:active {
-  transform: scale(0.985);
-}
-
-.prompfix-panel .secondary-button:hover {
-  transform: translateY(-1px);
-  background: rgba(124, 58, 237, 0.14);
-  border-color: rgba(124, 58, 237, 0.35);
-}
-
-/* Loading state for generate button — smooth */
-.prompfix-panel .primary-button:disabled {
-  opacity: 0.85;
-  transform: none;
 }

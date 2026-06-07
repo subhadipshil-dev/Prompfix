@@ -159,6 +159,11 @@ if (refineBtn) {
 
       // Stream the result (deliberate slow animation)
       await streamText(outputText, refined, 12);
+
+      // Persist to local history (if user opted in during setup)
+      if (typeof saveHistoryEntry === 'function') {
+        saveHistoryEntry(prompt, refined);
+      }
     } catch (err) {
       outputText.innerHTML = `<span style="color:#fca5a5;">Error: ${escapeHtml(err.message || 'Refinement failed')}</span>`;
     } finally {
