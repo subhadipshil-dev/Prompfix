@@ -1,0 +1,326 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#1a1a2e;display:flex;align-items:center;justify-content:center;min-height:600px;padding:20px}
+
+.popup{
+  width:340px;
+  background:#0e0e0e;
+  border-radius:18px;
+  border:1px solid #1e1e1e;
+  overflow:hidden;
+  box-shadow:0 30px 80px rgba(0,0,0,.7), 0 0 0 1px #1a1a1a;
+  display:flex;flex-direction:column;
+}
+
+/* ── Header ── */
+.popup-header{
+  padding:16px 18px 14px;
+  background:linear-gradient(180deg,#141414,#0e0e0e);
+  border-bottom:1px solid #1a1a1a;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.brand{display:flex;align-items:center;gap:9px}
+.brand-icon{
+  width:32px;height:32px;border-radius:9px;
+  background:#c8f565;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:900;color:#0a0a0a;
+  flex-shrink:0;
+  box-shadow:0 0 12px rgba(200,245,101,.3);
+}
+.brand-name{font-size:15px;font-weight:800;color:#fff;letter-spacing:-.3px}
+.provider-badge{
+  font-size:9px;font-weight:700;letter-spacing:.8px;
+  padding:2px 7px;border-radius:5px;
+  background:rgba(111,124,255,.15);
+  border:1px solid rgba(111,124,255,.25);
+  color:#8b97ff;margin-left:4px;text-transform:uppercase;
+}
+.header-actions{display:flex;align-items:center;gap:6px}
+.icon-btn{
+  width:28px;height:28px;border-radius:7px;
+  background:#1a1a1a;border:1px solid #222;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:#444;font-size:13px;transition:all .15s;
+}
+.icon-btn:hover{background:#222;color:#888}
+
+/* ── Body ── */
+.popup-body{padding:16px 18px;display:flex;flex-direction:column;gap:14px;flex:1}
+
+/* section label */
+.sec-label{
+  font-size:9px;font-weight:700;letter-spacing:.9px;
+  text-transform:uppercase;color:#333;
+  margin-bottom:7px;display:flex;align-items:center;gap:6px;
+}
+.sec-label::after{content:'';flex:1;height:1px;background:#1a1a1a}
+
+/* prompt input */
+.prompt-wrap{position:relative}
+.prompt-input{
+  width:100%;height:88px;resize:none;
+  background:#111;border:1px solid #1e1e1e;
+  border-radius:12px;padding:11px 13px;
+  color:#ddd;font-size:13px;font-family:'DM Sans',sans-serif;
+  outline:none;line-height:1.6;transition:border-color .2s, box-shadow .2s;
+}
+.prompt-input:focus{border-color:rgba(200,245,101,.25);box-shadow:0 0 0 3px rgba(200,245,101,.04)}
+.prompt-input::placeholder{color:#2a2a2a}
+.prompt-footer{display:flex;align-items:center;justify-content:space-between;margin-top:6px}
+.char-badge{font-size:10px;color:#2e2e2e}
+.grab-btn{
+  font-size:10px;font-weight:600;color:#444;
+  background:#1a1a1a;border:1px solid #222;border-radius:6px;
+  padding:3px 8px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:4px;
+}
+.grab-btn:hover{color:#c8f565;border-color:rgba(200,245,101,.2);background:rgba(200,245,101,.05)}
+
+/* pill groups */
+.pill-row{display:flex;flex-wrap:wrap;gap:5px}
+.pill{
+  font-size:11px;font-weight:600;padding:5px 11px;
+  border-radius:8px;border:1px solid #1e1e1e;
+  color:#3a3a3a;cursor:pointer;transition:all .15s;background:#111;
+  user-select:none;
+}
+.pill:hover{border-color:#333;color:#666}
+.pill.active-mode{background:rgba(200,245,101,.1);color:#c8f565;border-color:rgba(200,245,101,.28)}
+.pill.active-style{background:rgba(111,124,255,.12);color:#8b97ff;border-color:rgba(111,124,255,.28)}
+
+/* main button */
+.refine-btn{
+  width:100%;padding:13px;border:none;border-radius:12px;cursor:pointer;
+  font-size:13px;font-weight:700;font-family:'DM Sans',sans-serif;
+  background:linear-gradient(135deg,#c8f565 0%,#aadd40 100%);
+  color:#0a0a0a;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  transition:all .2s;position:relative;overflow:hidden;
+  box-shadow:0 4px 20px rgba(200,245,101,.2);
+}
+.refine-btn::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.2) 0%,transparent 55%);
+  pointer-events:none;
+}
+.refine-btn:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(200,245,101,.32)}
+.refine-btn:active{transform:translateY(0)}
+.refine-btn i{font-size:15px}
+
+/* output area */
+.output-section{
+  background:#111;border:1px solid #1e1e1e;
+  border-radius:12px;padding:13px;min-height:80px;
+  position:relative;
+}
+.output-placeholder{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:60px;gap:6px;
+}
+.output-placeholder-icon{font-size:20px;color:#1e1e1e}
+.output-placeholder-text{font-size:11px;color:#252525;text-align:center;line-height:1.5}
+.output-content{display:none}
+.output-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.output-dot-label{display:flex;align-items:center;gap:5px;font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#c8f565}
+.live-dot{width:5px;height:5px;border-radius:50%;background:#c8f565;animation:blink 1.2s ease infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.output-copy-btn{
+  font-size:10px;font-weight:600;color:#333;background:#1a1a1a;
+  border:1px solid #222;border-radius:5px;padding:2px 8px;cursor:pointer;transition:all .15s;
+}
+.output-copy-btn:hover{color:#888;border-color:#333}
+.output-text{font-size:12.5px;color:#bbb;line-height:1.65}
+.output-actions{display:flex;gap:6px;margin-top:11px}
+.oa{
+  flex:1;padding:8px;border-radius:8px;
+  font-size:11px;font-weight:700;font-family:'DM Sans',sans-serif;
+  cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:5px;
+}
+.oa-use{background:#c8f565;color:#0a0a0a;border:none}
+.oa-use:hover{background:#d4f872}
+.oa-insert{background:#1a1a1a;color:#555;border:1px solid #222}
+.oa-insert:hover{background:#222;color:#888}
+
+/* status bar */
+.status-bar{
+  padding:10px 18px;border-top:1px solid #141414;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.status-left{display:flex;align-items:center;gap:5px;font-size:10px;color:#2a2a2a}
+.status-dot{width:5px;height:5px;border-radius:50%;background:#c8f565;box-shadow:0 0 5px rgba(200,245,101,.5)}
+.status-provider{font-size:10px;color:#2a2a2a}
+.dash-link{
+  font-size:10px;color:#2e2e2e;cursor:pointer;
+  display:flex;align-items:center;gap:4px;transition:color .15s;
+}
+.dash-link:hover{color:#555}
+</style>
+
+<div class="popup">
+
+  <!-- Header -->
+  <div class="popup-header">
+    <div class="brand">
+      <div class="brand-icon">P</div>
+      <span class="brand-name">Prompfix</span>
+      <span class="provider-badge" id="provider-label">OpenRouter</span>
+    </div>
+    <div class="header-actions">
+      <div class="icon-btn" title="Settings"><i class="ti ti-settings"></i></div>
+      <div class="icon-btn" title="History"><i class="ti ti-history"></i></div>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="popup-body">
+
+    <!-- Prompt -->
+    <div>
+      <div class="sec-label">Your Prompt</div>
+      <div class="prompt-wrap">
+        <textarea class="prompt-input" id="prompt-input" placeholder="Enter your rough prompt here…" oninput="updateChar()"></textarea>
+        <div class="prompt-footer">
+          <span class="char-badge" id="char-count">0 chars</span>
+          <div class="grab-btn" onclick="grabPageText()">
+            <i class="ti ti-cursor-text" style="font-size:11px"></i> Grab from page
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mode -->
+    <div>
+      <div class="sec-label">Mode</div>
+      <div class="pill-row" id="mode-pills">
+        <div class="pill active-mode" onclick="selectMode(this)">Basic</div>
+        <div class="pill" onclick="selectMode(this)">Balanced</div>
+        <div class="pill" onclick="selectMode(this)">Advanced</div>
+      </div>
+    </div>
+
+    <!-- Style -->
+    <div>
+      <div class="sec-label">Style</div>
+      <div class="pill-row" id="style-pills">
+        <div class="pill active-style" onclick="selectStyle(this)">Clearer</div>
+        <div class="pill" onclick="selectStyle(this)">More Detailed</div>
+        <div class="pill" onclick="selectStyle(this)">Shorter</div>
+        <div class="pill" onclick="selectStyle(this)">Professional</div>
+        <div class="pill" onclick="selectStyle(this)">For Coding</div>
+      </div>
+    </div>
+
+    <!-- Refine button -->
+    <button class="refine-btn" onclick="doRefine()">
+      <i class="ti ti-sparkles"></i>
+      Refine Prompt
+    </button>
+
+    <!-- Output -->
+    <div>
+      <div class="sec-label">Refined Prompt</div>
+      <div class="output-section">
+        <div class="output-placeholder" id="output-placeholder">
+          <div class="output-placeholder-icon"><i class="ti ti-wand"></i></div>
+          <div class="output-placeholder-text">Your refined prompt<br>will appear here…</div>
+        </div>
+        <div class="output-content" id="output-content">
+          <div class="output-top">
+            <div class="output-dot-label"><span class="live-dot"></span> Output</div>
+            <div class="output-copy-btn" onclick="copyOutput()"><i class="ti ti-copy" style="font-size:11px"></i> Copy</div>
+          </div>
+          <div class="output-text" id="output-text"></div>
+          <div class="output-actions">
+            <button class="oa oa-use"><i class="ti ti-check" style="font-size:12px"></i> Use this</button>
+            <button class="oa oa-insert"><i class="ti ti-arrow-bar-to-down" style="font-size:12px"></i> Insert on page</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Status bar -->
+  <div class="status-bar">
+    <div class="status-left">
+      <div class="status-dot"></div>
+      <span class="status-provider" id="status-provider">OpenRouter · GPT-4o</span>
+    </div>
+    <div class="dash-link">
+      <i class="ti ti-layout-dashboard" style="font-size:11px"></i> Dashboard
+    </div>
+  </div>
+
+</div>
+
+<script>
+const outputs = {
+  Basic:{
+    Clearer:"Write a clear job application email.",
+    "More Detailed":"Write a job application email with key details.",
+    Shorter:"Short job application email.",
+    Professional:"Draft a formal job application email.",
+    "For Coding":"Write a developer job application email."
+  },
+  Balanced:{
+    Clearer:"Write a professional job application email for a software engineering role. Include a brief intro, 2 relevant skills, and a polite closing.",
+    "More Detailed":"Write a job application email for a software engineering role with 3 specific achievements, your top skills, and why you're interested in the company.",
+    Shorter:"Write a concise job application email — 3 sentences: who I am, why I'm a fit, next steps.",
+    Professional:"Compose a formal job application letter with a professional salutation, structured body, and courteous closing.",
+    "For Coding":"Write a developer job application email highlighting your tech stack, GitHub portfolio, and relevant open-source work."
+  },
+  Advanced:{
+    Clearer:"Write a compelling job application email for a senior software engineer position. Open by referencing a specific company product, highlight 2–3 measurable achievements (e.g. '40% reduction in API latency'), match your skills to the job description, express genuine enthusiasm for the company's mission, and close with a confident call-to-action requesting an interview.",
+    "More Detailed":"Craft a detailed job application email for a software engineering role. Structure: (1) Hook referencing a specific company initiative, (2) 3 achievements with metrics, (3) Technical skills mapped to the role, (4) Cultural fit paragraph, (5) Clear next-step CTA. Keep it under 300 words.",
+    Shorter:"Write a punchy 4-sentence job application email: one strong opening, one key achievement with a number, one reason you chose this company specifically, one CTA.",
+    Professional:"Write a polished, formal job application letter following business correspondence standards. Include: subject line, formal greeting, 3 structured paragraphs (introduction / value proposition / closing), and professional sign-off.",
+    "For Coding":"Write a software developer job application email. Highlight: specific languages and frameworks (Python, Go, React), a notable open-source contribution or GitHub project, your experience with distributed systems or the company's stack, and an invitation to review your portfolio."
+  }
+};
+
+let activeMode = 'Basic', activeStyle = 'Clearer';
+
+function selectMode(el){
+  document.querySelectorAll('#mode-pills .pill').forEach(p=>p.classList.remove('active-mode'));
+  el.classList.add('active-mode');
+  activeMode = el.textContent.trim();
+}
+function selectStyle(el){
+  document.querySelectorAll('#style-pills .pill').forEach(p=>p.classList.remove('active-style'));
+  el.classList.add('active-style');
+  activeStyle = el.textContent.trim();
+}
+function updateChar(){
+  const l = document.getElementById('prompt-input').value.length;
+  document.getElementById('char-count').textContent = l + ' chars';
+}
+function grabPageText(){
+  const demo = "write email for job application at google";
+  document.getElementById('prompt-input').value = demo;
+  document.getElementById('char-count').textContent = demo.length + ' chars';
+}
+function doRefine(){
+  const ph = document.getElementById('output-placeholder');
+  const oc = document.getElementById('output-content');
+  const ot = document.getElementById('output-text');
+  ph.style.display='none';
+  oc.style.display='block';
+  ot.textContent='';
+  const txt = (outputs[activeMode]||outputs['Advanced'])[activeStyle]||outputs['Advanced']['Clearer'];
+  let i=0;
+  const iv = setInterval(()=>{
+    ot.textContent += txt[i]; i++;
+    if(i>=txt.length) clearInterval(iv);
+  }, 16);
+}
+function copyOutput(){
+  const t = document.getElementById('output-text').textContent;
+  navigator.clipboard.writeText(t).catch(()=>{});
+  const b = event.currentTarget;
+  const orig = b.innerHTML;
+  b.innerHTML='<i class="ti ti-check" style="font-size:11px"></i> Copied!';
+  setTimeout(()=>b.innerHTML=orig,1500);
+}
+</script>

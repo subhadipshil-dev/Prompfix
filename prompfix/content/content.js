@@ -773,3 +773,73 @@ document.addEventListener('click', (event) => {
 
 // Load settings on init
 loadSettings();
+
+// Support for popup commands (grab text, replace input, insert at cursor from the extension popup)
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if (msg.action === 'getPageText') {
+    let text = '';
+    try {
+      const sel = (window.getSelection && window.getSelection().toString().trim()) || '';
+      if (sel) {
+        text = sel;
+      } else if (activeTarget) {
+        text = getTargetText(activeTarget);
+      } else {
+        const ae = document.activeElement;
+        if (ae && isEditableElement(ae)) {
+          text = getTargetText(ae);
+        }
+      }
+    } catch (e) {}
+    sendResponse({ success: true, text: text || '' });
+    return true;
+  }
+
+  if (msg.action === 'replaceActiveInput' && typeof msg.text === 'string') {
+    let target = activeTarget;
+    if (!target) {
+      const ae = document.activeElement;
+      if (ae && isEditableElement(ae)) target = ae;
+    }
+    if (target) {
+      setTargetText(target, msg.text);
+      sendResponse({ success: true });
+    } else {
+      sendResponse({ success: false, error: 'No active editable field' });
+    }
+    return true;
+  }
+
+  if (msg.action === 'insertAtCursor' && typeof msg.text === 'string') {
+    const ae = document.activeElement;
+    let ok = false;
+    try {
+      if (ae && (ae.tagName === 'TEXTAREA' || (ae.tagName === 'INPUT' && /^(text|search|url|tel|email|password)$/.test(ae.type || '')))) {
+        const start = ae.selectionStart != null ? ae.selectionStart : ae.value.length;
+        const end = ae.selectionEnd != null ? ae.selectionEnd : ae.value.length;
+        ae.value = ae.value.slice(0, start) + msg.text + ae.value.slice(end);
+        const newPos = start + msg.text.length;
+        ae.selectionStart = ae.selectionEnd = newPos;
+        ae.dispatchEvent(new Event('input', { bubbles: true }));
+        ok = true;
+      } else if (ae && ae.isContentEditable) {
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0) {
+          const range = sel.getRangeAt(0);
+          range.deleteContents();
+          range.insertNode(document.createTextNode(msg.text));
+          range.collapse(false);
+          sel.removeAllRanges();
+          sel.addRange(range);
+        } else {
+          ae.appendChild(document.createTextNode(msg.text));
+        }
+        ok = true;
+      }
+    } catch (e) {}
+    sendResponse({ success: ok });
+    return true;
+  }
+
+  return false;
+});
