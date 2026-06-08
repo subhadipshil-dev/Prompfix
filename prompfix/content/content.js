@@ -11,22 +11,7 @@ const MODE_NAMES = ['Basic', 'Balanced', 'Advanced'];
 
 // Cool professional inline SVG logo mark (sparkle + refinement symbol)
 function getLogoSVG() {
-  return `
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <defs>
-        <linearGradient id="pfGrad" x1="4" y1="4" x2="20" y2="20" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#ffffff" stop-opacity="0.95"/>
-          <stop offset="1" stop-color="#f0e7ff" stop-opacity="0.85"/>
-        </linearGradient>
-      </defs>
-      <!-- Outer refined shape hint -->
-      <rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/>
-      <!-- Main sparkle / refinement glyph -->
-      <path d="M12 5.2 L13.6 10.4 L19 12 L13.6 13.6 L12 18.8 L10.4 13.6 L5 12 L10.4 10.4 Z" fill="url(#pfGrad)"/>
-      <!-- Small accent dot for polish -->
-      <circle cx="17.2" cy="6.8" r="1.35" fill="#fff" fill-opacity="0.9"/>
-    </svg>
-  `;
+  return `<img src="${chrome.runtime.getURL('assets/icons/favicon_io/android-chrome-192x192.png')}" alt="Prompfix" style="width: 100%; height: 100%; object-fit: contain; pointer-events: none; border-radius: 8px;">`;
 }
 
 // Create the draggable floating logo (replaces the old text button)
@@ -213,7 +198,7 @@ function createPanel() {
     <div class="panel-header" id="panel-drag-handle">
       <div class="header-left">
         <div class="header-icon">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L13.6 7.2L19 8.8L13.6 10.4L12 15.6L10.4 10.4L5 8.8L10.4 7.2L12 2Z"/><circle cx="17.5" cy="5.5" r="1.8"/></svg>
+          <img src="${chrome.runtime.getURL('assets/icons/favicon_io/android-chrome-192x192.png')}" alt="Prompfix" style="width: 20px; height: 20px; object-fit: contain; border-radius: 4px;">
         </div>
         <div>
           <div class="panel-title">Refine Prompt</div>
