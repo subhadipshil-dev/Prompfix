@@ -261,6 +261,9 @@ body::after {
   flex: 1;
   overflow-y: auto;
   padding: 56px 72px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .scroll::-webkit-scrollbar { width: 6px; }
@@ -268,7 +271,13 @@ body::after {
 .scroll::-webkit-scrollbar-track { background: transparent; }
 
 /* Pane transitions */
-.pane { transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.4,0,0.2,1); }
+.pane {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.4,0,0.2,1);
+}
 .pane.hidden { opacity: 0; transform: translateX(30px); }
 .pane.hidden.bwd { transform: translateX(-30px); }
 
@@ -295,6 +304,7 @@ h1 {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  text-align: center;
 }
 
 .sub {
@@ -303,6 +313,8 @@ h1 {
   margin-bottom: 36px;
   display: flex;
   align-items: center;
+  justify-content: center;
+  text-align: center;
   gap: 8px;
   line-height: 1.6;
 }
@@ -317,7 +329,7 @@ h1 {
   margin-bottom: 10px;
 }
 
-.fld { margin-bottom: 24px; max-width: 480px; } /* Restricted input width */
+.fld { margin-bottom: 24px; width: 100%; } /* Width handled by pane */
 
 /* ── INPUTS ── */
 input[type=text], input[type=password] {
@@ -772,7 +784,6 @@ input::placeholder { color: var(--border2); }
   border-radius: 16px;
   padding: 24px 28px;
   width: 100%;
-  max-width: 400px;
   text-align: left;
   margin-bottom: 36px;
   box-shadow: 0 16px 40px rgba(0,0,0,0.4);
